@@ -34,7 +34,8 @@ import {
   Minimize2
 } from 'lucide-react';
 
-const apiKey = "";
+// Your Google AI Studio API Key is now integrated
+const apiKey = "AIzaSyCGTS5q7d8o3W5bPlSp0O-z1d1ZIE-w-RI";
 
 // --- ChatBot Component ---
 const ChatBot = ({ messages, setMessages }) => {
@@ -53,24 +54,24 @@ const ChatBot = ({ messages, setMessages }) => {
     const userMsgCount = messages.filter(m => m.role === 'user').length + 1;
     
     let contactInstruction = "";
+    // Recommend contact on the 2nd question, and every 3rd question after that
     if (userMsgCount === 2 || (userMsgCount > 2 && (userMsgCount - 2) % 3 === 0)) {
-       contactInstruction = "\n\nCRITICAL CONVERSION STEP: You must now recommend the user contact us at hello@callistadigital.com or via Instagram (@callistadigital) to move forward.";
+       contactInstruction = "\n\nREQUIRED ACTION: You must now end this specific message by telling the user the best way to get started is to email hello@callistadigital.com or DM @callistadigital on Instagram.";
     }
 
     const systemPrompt = `You are a professional Digital Strategist for Callista Digital. 
-    Our pricing and structure:
-    - 2-Page Brand Build: $797 (Founder's Special).
-    - 3-Page Custom Site: $1497.
-    - 5-Page Complete Presence: $2397 (Includes blog, premium management, and AEO optimization).
-    - Support: One flat rate of $49/mo.
-    - Infrastructure: Global edge network (The Hotel Chain) vs single servers (The Single House).
-
-    FORMATTING RULES:
-    - NEVER use Markdown symbols like ###, **, or __.
-    - NEVER use tables or pipe symbols (|).
-    - NEVER use bullet points with symbols like * or -. Use simple dashes if needed.
-    - Communicate in CLEAN PLAIN TEXT ONLY. Use simple line breaks for readability.
-    - Tone: Sophisticated, helpful, minimalist.${contactInstruction}`;
+    Services:
+    - 2-Page Brand Build: $797 (Founder's Special). Focus: Clarity and conversion.
+    - 3-Page Custom Site: $1497. Focus: Custom interior content and depth.
+    - 5-Page Complete Presence: $2397. Includes a blog, premium management, and AEO optimization (AI Search).
+    - Support: One flat rate of $49/mo for hosting, updates, and maintenance.
+    
+    CRITICAL FORMATTING RULES:
+    - Communicate in PLAIN TEXT ONLY.
+    - NEVER use hashtags (#), bolding symbols (**), or tables.
+    - Do not use markdown. Use simple line breaks for space between paragraphs.
+    - Be elite, professional, and minimalist in your tone.
+    ${contactInstruction}`;
 
     try {
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
@@ -81,11 +82,15 @@ const ChatBot = ({ messages, setMessages }) => {
           systemInstruction: { parts: [{ text: systemPrompt }] }
         })
       });
+      
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm having trouble connecting. Could you try that again?";
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm having trouble connecting right now. Please email hello@callistadigital.com!";
+      
+      // Secondary cleanup to ensure no markdown slips through to the UI
+      return rawText.replace(/[#*_|]/g, '');
     } catch (error) {
       if (retryCount < 3) return callGemini(userQuery, retryCount + 1);
-      return "I'm experiencing a technical glitch. Please reach out to us at hello@callistadigital.com!";
+      return "I'm experiencing a brief network interruption. Please reach out to us directly at hello@callistadigital.com!";
     }
   };
 
@@ -114,7 +119,7 @@ const ChatBot = ({ messages, setMessages }) => {
           <div ref={scrollRef} className="flex-grow p-5 overflow-y-auto space-y-4 scrollbar-hide">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-amber-500 text-slate-950 rounded-tr-none shadow-lg' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-white/5 shadow-md'}`}>
+                <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg ${m.role === 'user' ? 'bg-amber-500 text-slate-950 rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-white/5'}`}>
                   {m.text}
                 </div>
               </div>
@@ -129,7 +134,7 @@ const ChatBot = ({ messages, setMessages }) => {
           </div>
           <div className="p-4 bg-slate-950 border-t border-white/5 flex space-x-2">
             <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask a question..." className="flex-grow bg-slate-900 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none placeholder:text-slate-600" />
-            <button onClick={handleSend} className="p-2 bg-amber-500 rounded-full text-slate-950 hover:scale-105 transition-transform"><Send className="w-4 h-4" /></button>
+            <button onClick={handleSend} disabled={isLoading} className="p-2 bg-amber-500 rounded-full text-slate-950 hover:scale-105 transition-transform disabled:opacity-50"><Send className="w-4 h-4" /></button>
           </div>
         </div>
       ) : (
@@ -191,17 +196,19 @@ const App = () => {
           <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center transition-transform group-hover:rotate-12 font-black text-slate-950 text-[10px]">CD</div>
           <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white">CALLISTA DIGITAL</span>
         </div>
-        <GlowingButton small theme="silver" onClick={() => setView(view === 'home' ? 'pricing' : 'home')}>
-          {view === 'home' ? 'Pricing' : 'Home'}
-        </GlowingButton>
+        <div className="flex items-center space-x-4">
+          <GlowingButton small theme="silver" onClick={() => setView(view === 'home' ? 'pricing' : 'home')}>
+            {view === 'home' ? 'Pricing' : 'Home'}
+          </GlowingButton>
+        </div>
       </div>
     </nav>
   );
 
   const PageOne = () => (
-    <div className="bg-slate-950 text-white w-full font-sans">
+    <div className="bg-slate-950 text-white w-full font-sans overflow-x-hidden">
       <Header />
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img src={HERO_IMAGE} alt="Hero" className="w-full h-full object-cover opacity-30" />
@@ -212,21 +219,21 @@ const App = () => {
             <div className="inline-flex items-center space-x-2 px-4 py-2 mb-8 text-[10px] font-black tracking-[0.3em] uppercase bg-amber-500/10 text-amber-500 rounded-full border border-amber-500/20 backdrop-blur-sm">
               <Sparkles className="w-3 h-3" /><span>Personal Brand Excellence</span>
             </div>
-            <h1 className="text-5xl md:text-9xl font-black tracking-tighter mb-8 leading-[0.9] uppercase">LOOK <span className="text-amber-500">LEGIT</span> <br className="hidden md:block" /><span className="text-white/90">EVERYWHERE.</span></h1>
+            <h1 className="text-5xl md:text-9xl font-black tracking-tighter mb-8 leading-[0.9] uppercase drop-shadow-2xl">LOOK <span className="text-amber-500">LEGIT</span> <br className="hidden md:block" /><span className="text-white/90">EVERYWHERE.</span></h1>
             <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-2xl mx-auto font-light px-4 md:px-0 text-center">Stop using messy bio links. I build <span className="text-white font-bold underline decoration-amber-500 underline-offset-8 decoration-4">high-performance</span> splash pages for leaders.</p>
             <GlowingButton onClick={() => setView('pricing')} theme="gold">Get Your Page Built <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" /></GlowingButton>
           </ScrollReveal>
         </div>
       </section>
 
-      {/* Authority */}
-      <section className="px-6 py-24 md:py-32 bg-slate-900 relative border-y border-white/5">
+      {/* The Authority Section */}
+      <section className="px-6 py-24 md:py-32 bg-slate-900 relative border-y border-white/5 shadow-inner">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
               <div className="relative">
                 <div className="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 blur-[60px] rounded-full" />
-                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white uppercase font-black">The Authority</h2>
+                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white font-black">The Authority</h2>
                 <p className="text-3xl md:text-6xl font-black leading-[1.1] mb-8 text-white uppercase tracking-tight">I replace <span className="text-slate-500">cluttered links</span> with professional power.</p>
                 <div className="h-1 w-20 bg-amber-500" />
               </div>
@@ -236,19 +243,19 @@ const App = () => {
         </div>
       </section>
 
-      {/* Expertise */}
+      {/* Expertise Cards */}
       <section className="px-6 py-24 md:py-32 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {[
-            { title: "Splash Page Design", desc: "Minimalist, high-conversion layouts.", icon: <Layout /> },
-            { title: "2-Page Strategy", desc: "Brand page + your specific next step.", icon: <ChevronRight /> },
-            { title: "Social Traffic Mastery", desc: "Built specifically for profile clicks.", icon: <Zap /> },
-            { title: "Turnkey Hosting", desc: "No tech headaches. I host it for you.", icon: <Globe /> }
+            { title: "Splash Page Design", desc: "Minimalist, high-conversion layouts designed for impact.", icon: <Layout /> },
+            { title: "Strategic Architecture", desc: "Intentional page flows that lead visitors to action.", icon: <ChevronRight /> },
+            { title: "Social Traffic Mastery", desc: "Optimized specifically for high-volume profile clicks.", icon: <Zap /> },
+            { title: "Global Hosting", desc: "Ultra-fast, maintenance-free edge infrastructure.", icon: <Globe /> }
           ].map((s, i) => (
             <ScrollReveal key={i}>
-              <div className="group p-8 md:p-10 h-full rounded-[30px] md:rounded-[40px] bg-slate-900 border border-white/5 hover:border-amber-500/50 transition-all shadow-2xl">
-                <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center mb-6 text-amber-500 group-hover:scale-110 transition-transform">{s.icon}</div>
-                <h3 className="text-xl md:text-2xl font-bold mb-4">{s.title}</h3>
+              <div className="group p-8 md:p-10 h-full rounded-[40px] bg-slate-900 border border-white/5 hover:border-amber-500/50 transition-all duration-500 shadow-xl">
+                <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center mb-6 text-amber-500 group-hover:scale-110 transition-transform shadow-lg">{s.icon}</div>
+                <h3 className="text-xl md:text-2xl font-bold mb-4 uppercase tracking-tight">{s.title}</h3>
                 <p className="text-slate-400 font-light text-base md:text-lg">{s.desc}</p>
               </div>
             </ScrollReveal>
@@ -256,18 +263,18 @@ const App = () => {
         </div>
       </section>
 
-      {/* Infrastructure Section */}
+      {/* Comparison Grid */}
       <section className="px-6 py-24 md:py-32 bg-slate-950">
         <ScrollReveal>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-20 md:mb-24">
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">The Infrastructure</h2>
               <h3 className="text-4xl md:text-7xl font-black tracking-tighter uppercase mb-8 leading-none">BUILT DIFFERENT.</h3>
-              <p className="text-slate-400 text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed italic">Most websites sit on one cheap server. Ours run on the same global edge network used by modern apps — fast, secure, maintenance-free.</p>
+              <p className="text-slate-400 text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed italic px-4">Most websites sit on one cheap server. Ours run on the same global edge network used by modern apps — fast, secure, maintenance-free.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-stretch relative">
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-1/2 h-full bg-amber-500/5 blur-[120px] rounded-full hidden lg:block pointer-events-none" />
-              <div className="bg-slate-900/50 p-8 md:p-12 rounded-t-[40px] lg:rounded-tr-none lg:rounded-l-[40px] border border-white/10 relative z-10">
+              <div className="bg-slate-900/50 p-8 md:p-12 rounded-t-[40px] lg:rounded-tr-none lg:rounded-l-[40px] border border-white/10 relative z-10 shadow-lg">
                 <h4 className="text-xl font-bold text-slate-200 mb-10 flex items-center uppercase tracking-tight"><Home className="w-6 h-6 mr-3 text-slate-500" /> Traditional Hosting</h4>
                 <div className="space-y-6">
                   {[
@@ -303,37 +310,37 @@ const App = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-16 text-center space-y-8">
+            <div className="mt-16 text-center space-y-8 px-4">
               <p className="text-[10px] font-black uppercase tracking-[0.5em] text-amber-500/80">Modern businesses don't run on single servers anymore.</p>
-              <p className="text-slate-400 text-sm italic max-w-4xl mx-auto px-4 leading-relaxed font-light">“Our client sites are hosted on the same global edge infrastructure used by modern streaming platforms and SaaS companies — meaning ultra-fast load times, automatic scaling, and zero downtime.”</p>
+              <p className="text-slate-400 text-sm italic max-w-4xl mx-auto leading-relaxed font-light">“Our client sites are hosted on the same global edge infrastructure used by modern streaming platforms and SaaS companies — meaning ultra-fast load times, automatic scaling, and zero downtime.”</p>
             </div>
           </div>
         </ScrollReveal>
       </section>
 
       {/* Social Proof */}
-      <section className="px-6 py-24 bg-white text-slate-950 text-center">
+      <section className="px-6 py-24 bg-white text-slate-950 text-center shadow-2xl">
         <ScrollReveal>
           <div className="flex justify-center space-x-2 mb-10">
-            {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-8 h-8 md:w-12 md:h-12 text-amber-500 fill-amber-500 shadow-sm" />)}
+            {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-8 h-8 md:w-12 md:h-12 text-amber-500 fill-amber-500" />)}
           </div>
-          <h2 className="text-4xl md:text-7xl font-black mb-16 tracking-tighter uppercase text-slate-950 leading-[0.9]">TRUSTED BY <br/> MODERN LEADERS.</h2>
+          <h2 className="text-4xl md:text-7xl font-black mb-16 tracking-tighter uppercase leading-[0.9]">TRUSTED BY <br/> MODERN LEADERS.</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left max-w-6xl mx-auto">
             {[{ l: "Experience", v: "10+ Years" }, { l: "Focus", v: "Conversion" }, { l: "Systems", v: "Custom Built" }].map((stat, i) => (
-              <div key={i} className="border-t-4 border-slate-950 pt-8"><p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">{stat.l}</p><p className="text-3xl font-black">{stat.v}</p></div>
+              <div key={i} className="border-t-4 border-slate-950 pt-8 shadow-sm"><p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">{stat.l}</p><p className="text-3xl font-black">{stat.v}</p></div>
             ))}
           </div>
         </ScrollReveal>
       </section>
 
-      {/* About */}
-      <section className="px-6 py-32 max-w-6xl mx-auto font-black uppercase tracking-tight">
+      {/* Founder Profile */}
+      <section className="px-6 py-32 max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="grid grid-cols-1 lg:grid-cols-2 bg-slate-900 rounded-[60px] border border-white/5 overflow-hidden shadow-2xl">
-            <div className="p-10 md:p-24 flex flex-col justify-center order-2 lg:order-1 font-sans lowercase">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8">The Studio</h2>
-              <p className="text-3xl md:text-4xl font-bold leading-tight mb-8 normal-case text-white">I help creators replace cluttered bio links with a <span className="italic underline decoration-amber-500 decoration-4 text-white">clean brand page.</span></p>
-              <p className="text-slate-400 text-lg font-light mb-10 normal-case">My goal is simple: make you look legit online and give people one clear place to go next.</p>
+            <div className="p-10 md:p-24 flex flex-col justify-center order-2 lg:order-1 font-sans">
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 tracking-widest">The Studio</h2>
+              <p className="text-3xl md:text-4xl font-bold leading-tight mb-8 text-white">I help creators replace cluttered bio links with a <span className="italic underline decoration-amber-500 decoration-4 text-white">clean brand page.</span></p>
+              <p className="text-slate-400 text-lg font-light mb-10 leading-relaxed">My goal is simple: make you look legit online and give people one clear place to go next.</p>
               <div className="flex items-center space-x-3 uppercase"><div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /><p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 font-black tracking-widest">Callista Digital Strategy</p></div>
             </div>
             <div className="relative min-h-[400px] md:min-h-[600px] bg-slate-950 overflow-hidden order-1 lg:order-2">
@@ -344,8 +351,8 @@ const App = () => {
         </ScrollReveal>
       </section>
 
-      {/* Final CTA */}
-      <section className="px-6 py-24 md:py-32 bg-slate-950 text-center font-sans">
+      {/* CTA Section */}
+      <section className="px-6 py-24 md:py-32 bg-slate-950 text-center">
         <ScrollReveal>
           <h2 className="text-4xl md:text-6xl font-black mb-12 uppercase tracking-tighter leading-[0.9]">READY TO <br/> <span className="text-amber-500 uppercase">GET STARTED?</span></h2>
           <GlowingButton onClick={() => setView('pricing')}>Get Your Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
@@ -367,7 +374,7 @@ const App = () => {
   );
 
   const PageTwo = () => (
-    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-amber-500/30">
+    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-amber-500/30 overflow-x-hidden">
       <Header />
       <main className="pt-32 pb-24 px-6 max-w-7xl mx-auto w-full">
         <ScrollReveal>
@@ -378,12 +385,12 @@ const App = () => {
           </div>
         </ScrollReveal>
 
-        {/* Setup Tiers */}
-        <section className="mb-40">
+        {/* Setup Tiers - Fixed Overflow to Prevent Badge Clipping */}
+        <section className="mb-40 overflow-visible">
           <ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 items-stretch mt-12 px-4 md:px-0">
-              {/* Special */}
-              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border-2 border-amber-500/40 flex flex-col shadow-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 items-stretch mt-12 px-4 md:px-0 overflow-visible">
+              {/* Founder Card */}
+              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border-2 border-amber-500/40 flex flex-col shadow-2xl overflow-visible">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap shadow-xl z-30">Founder's Special</div>
                 <div className="text-center mb-10 pt-8">
                   <span className="text-slate-500 text-sm font-bold line-through">REGULAR $997</span>
@@ -391,7 +398,7 @@ const App = () => {
                   <p className="text-[10px] font-black text-amber-500 uppercase mt-4 tracking-widest">One-Time Setup</p>
                 </div>
                 <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">2-Page Brand Build</h4>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium">
+                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
                   {["Brand + Clarity Landing", "Next-Step Action Page", "Mobile-First Design", "Hosted Setup & Launch", "Strategic Layout"].map((f, i) => (
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
@@ -399,29 +406,29 @@ const App = () => {
                 <GlowingButton variant="none" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Secure My Build</GlowingButton>
               </div>
 
-              {/* Premium */}
+              {/* Premium Card */}
               <div className="bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/5 flex flex-col shadow-lg">
                 <div className="text-center mb-10 pt-8">
                   <div className="flex justify-center items-center font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">1497</span></div>
                   <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest">Premium Setup</p>
                 </div>
                 <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">3-Page Custom Site</h4>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium">
+                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
                   {["Everything in Founder's", "Custom Interior Page", "Enhanced Visual Content", "Priority Strategy Session", "Custom Brand Styling"].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3 text-xs md:text-sm"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
+                    <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
                 <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Select Premium</GlowingButton>
               </div>
 
-              {/* Enterprise */}
-              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/10 flex flex-col overflow-hidden shadow-lg">
+              {/* Enterprise Card */}
+              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/10 flex flex-col shadow-lg overflow-visible">
                 <div className="text-center mb-10 pt-8">
                   <div className="flex justify-center items-center font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">2397</span></div>
                   <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest">Authority Setup</p>
                 </div>
                 <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight text-white">Complete Presence</h4>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium">
+                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
                   {[
                     "Full 5-Page Architecture",
                     "Integrated Professional Blog",
@@ -432,8 +439,8 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                   <div className="pt-4 border-t border-white/5 space-y-3">
-                    <div className="flex items-center space-x-3 text-slate-500"><FileText className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase">$50/Professional Blog Post</span></div>
-                    <div className="flex items-center space-x-3 text-slate-500"><Search className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase text-amber-500/80">Optimized for AI Search</span></div>
+                    <div className="flex items-center space-x-3 text-slate-500"><FileText className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase tracking-widest">$50/Professional Blog Post</span></div>
+                    <div className="flex items-center space-x-3 text-slate-500"><Search className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase text-amber-500/80 tracking-widest">Optimized for AI Search</span></div>
                   </div>
                 </div>
                 <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Select Enterprise</GlowingButton>
@@ -442,15 +449,15 @@ const App = () => {
           </ScrollReveal>
         </section>
 
-        {/* Management Plan */}
+        {/* Unified Support Section */}
         <section className="mb-40" id="support-plan">
           <ScrollReveal>
-            <div className="text-center mb-16 max-w-md mx-auto">
+            <div className="text-center mb-16 max-w-md mx-auto px-4">
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">Ongoing Support</h2>
               <div className="relative p-10 rounded-[48px] bg-slate-900 border-2 border-amber-500/20 shadow-3xl text-center hover:border-amber-500/40 transition-all group">
                 <div className="flex flex-col items-center mb-10">
                   <div className="flex items-baseline font-sans"><span className="text-2xl font-black text-slate-500 mr-1">$</span><span className="text-7xl font-black text-white tracking-tighter">49</span><span className="text-slate-500 text-xs font-black ml-2 uppercase tracking-widest">/ month</span></div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase mt-4 italic tracking-widest font-black">Standard for all active builds</p>
+                  <p className="text-[10px] font-black text-amber-500 uppercase mt-4 italic tracking-widest font-black">Professional Management</p>
                 </div>
                 <div className="space-y-4 mb-10 text-left text-sm text-slate-300 font-medium">
                   {["Global edge network hosting", "Secure SSL & uptime monitoring", "Unlimited global bandwidth", "1 Professional edit per month", "Text or image swaps included", "DM or Email technical support"].map((f, i) => (
@@ -465,7 +472,7 @@ const App = () => {
 
         {/* Small Edit Policy */}
         <ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-slate-900/50 p-10 md:p-16 rounded-[48px] border border-white/5 mb-40 shadow-xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-slate-900/50 p-10 md:p-16 rounded-[48px] border border-white/5 mb-40 shadow-xl mx-4 md:mx-0">
             <div>
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">Policy</h2>
               <h3 className="text-3xl md:text-4xl font-black mb-6 uppercase text-white tracking-tight leading-none">WHAT COUNTS AS A <br/> “SMALL EDIT”?</h3>
@@ -484,10 +491,10 @@ const App = () => {
           </div>
         </ScrollReveal>
 
-        {/* Custom Solutions Section */}
+        {/* Enterprise/Custom Section */}
         <section className="mb-40">
           <ScrollReveal>
-            <div className="bg-amber-500/5 border border-amber-500/20 p-10 md:p-20 rounded-[60px] text-center relative overflow-hidden group shadow-2xl">
+            <div className="bg-amber-500/5 border border-amber-500/20 p-10 md:p-20 rounded-[60px] text-center relative overflow-hidden group shadow-2xl mx-4 md:mx-0">
               <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none duration-1000"><Globe className="w-64 h-64 text-amber-500" /></div>
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black tracking-widest">Custom Solutions</h2>
               <h3 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter uppercase leading-none">CUSTOM ARCHITECTURE.</h3>
