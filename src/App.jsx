@@ -168,10 +168,10 @@ const App = () => {
             <img 
               src={HERO_IMAGE} 
               alt="Callista Digital Hero" 
-              className="w-full h-full object-cover transition-opacity duration-1000 opacity-90" 
+              className="w-full h-full object-cover transition-opacity duration-1000 opacity-40" 
             />
-            {/* Adjusted Gradient to be slightly lighter in the center for visibility */}
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/30 to-slate-950" />
+            {/* Gradient Overlay for Moodier Darkness */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/60 to-slate-950" />
           </div>
         </div>
 
@@ -185,7 +185,7 @@ const App = () => {
               LOOK <span className="text-amber-500">LEGIT</span> <br className="hidden md:block" /> 
               <span className="text-white/90">EVERYWHERE.</span>
             </h1>
-            <p className="text-xl md:text-2xl text-slate-200 mb-12 leading-relaxed max-w-2xl mx-auto font-light px-4 md:px-0 drop-shadow-md">
+            <p className="text-xl md:text-2xl text-slate-200 mb-12 leading-relaxed max-w-2xl mx-auto font-light px-4 md:px-0">
               Stop using messy bio links. I build <span className="text-white font-bold underline decoration-amber-500 underline-offset-8 decoration-4">high-performance</span> splash pages for leaders.
             </p>
             <GlowingButton onClick={() => setView('contact')} theme="gold" className="w-full md:w-auto">
@@ -307,7 +307,6 @@ const App = () => {
 
               <div className="relative bg-slate-900 p-8 md:p-12 rounded-b-[40px] lg:rounded-bl-none lg:rounded-r-[40px] border-2 border-amber-500/30 shadow-[0_0_100px_rgba(212,175,55,0.08)] overflow-hidden z-20">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[100px] pointer-events-none" />
-                
                 <div className="flex items-center space-x-4 mb-10 relative z-10">
                    <div className="p-3 bg-amber-500/10 rounded-xl">
                       <Network className="w-6 h-6 text-amber-500" />
