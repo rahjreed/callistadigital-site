@@ -9,7 +9,7 @@ import {
   Layout, 
   Zap, 
   History,
-  Sparkles,
+  Sparkles, 
   Globe,
   Loader2,
   Camera,
@@ -25,10 +25,11 @@ import {
   Info,
   Home,
   Network,
-  X
+  X,
+  Layers,
+  FileText,
+  Search
 } from 'lucide-react';
-
-const apiKey = "";
 
 // Reusable Scroll Reveal Component
 const ScrollReveal = ({ children, width = "w-full" }) => {
@@ -62,53 +63,6 @@ const ScrollReveal = ({ children, width = "w-full" }) => {
       }`}
     >
       {children}
-    </div>
-  );
-};
-
-// Countdown Timer Component
-const CountdownTimer = ({ targetDate }) => {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = new Date(targetDate).getTime() - now;
-
-      if (distance < 0) {
-        clearInterval(timer);
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      } else {
-        setTimeLeft({
-          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((distance % (1000 * 60)) / 1000)
-        });
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [targetDate]);
-
-  const TimeBlock = ({ value, label }) => (
-    <div className="flex flex-col items-center flex-1">
-      <div className="w-full h-12 flex items-center justify-center bg-slate-950 border border-amber-500/20 rounded-xl mb-1">
-        <span className="text-xl font-black text-white">{value}</span>
-      </div>
-      <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-500">{label}</span>
-    </div>
-  );
-
-  return (
-    <div className="flex justify-center items-center space-x-2 w-full">
-      <TimeBlock value={timeLeft.days} label="Days" />
-      <span className="text-amber-500 font-bold mb-4">:</span>
-      <TimeBlock value={timeLeft.hours} label="Hours" />
-      <span className="text-amber-500 font-bold mb-4">:</span>
-      <TimeBlock value={timeLeft.minutes} label="Mins" />
-      <span className="text-amber-500 font-bold mb-4">:</span>
-      <TimeBlock value={timeLeft.seconds} label="Secs" />
     </div>
   );
 };
@@ -172,48 +126,14 @@ const GlowingButton = ({
 
 const App = () => {
   const [view, setView] = useState('home');
-  const [heroImage, setHeroImage] = useState(null);
-  const [aboutImage, setAboutImage] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Hardcoded Assets
+  const HERO_IMAGE = "https://images.travelprox.com/callista/cdhero.png";
+  const WOMAN_IMAGE = "https://images.travelprox.com/callista/woman.png";
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [view]);
-
-  useEffect(() => {
-    if (!heroImage && !isGenerating) {
-      generateImages();
-    }
-  }, []);
-
-  const generateImages = async () => {
-    setIsGenerating(true);
-    try {
-      const heroPrompt = "Ultra-modern minimalist office, blurred background, navy and gold lighting, cinematic photography";
-      const heroRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
-        method: "POST",
-        body: JSON.stringify({ instances: [{ prompt: heroPrompt }], parameters: { sampleCount: 1 } })
-      });
-      const heroData = await heroRes.json();
-      if (heroData.predictions?.[0]?.bytesBase64Encoded) {
-        setHeroImage(`data:image/png;base64,${heroData.predictions[0].bytesBase64Encoded}`);
-      }
-
-      const aboutPrompt = "Confident Black woman creative professional, minimalist fashion, warm gold studio lighting, navy shadows";
-      const aboutRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
-        method: "POST",
-        body: JSON.stringify({ instances: [{ prompt: aboutPrompt }], parameters: { sampleCount: 1 } })
-      });
-      const aboutData = await aboutRes.json();
-      if (aboutData.predictions?.[0]?.bytesBase64Encoded) {
-        setAboutImage(`data:image/png;base64,${aboutData.predictions[0].bytesBase64Encoded}`);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const Header = () => (
     <nav className="fixed top-0 left-0 w-full z-50 px-4 py-4">
@@ -244,14 +164,15 @@ const App = () => {
       {/* Hero Section */}
       <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center px-4 md:px-6 pt-24 pb-12 overflow-hidden w-full">
         <div className="absolute inset-0 z-0">
-          {heroImage ? (
-            <div className="absolute inset-0 transition-opacity duration-1000 opacity-40">
-              <img src={heroImage} alt="Background" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/60 to-slate-950" />
-            </div>
-          ) : (
-             <div className="absolute inset-0 bg-slate-900 animate-pulse" />
-          )}
+          <div className="absolute inset-0">
+            <img 
+              src={HERO_IMAGE} 
+              alt="Callista Digital Hero" 
+              className="w-full h-full object-cover transition-opacity duration-1000 opacity-90" 
+            />
+            {/* Adjusted Gradient to be slightly lighter in the center for visibility */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/30 to-slate-950" />
+          </div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto text-center w-full">
@@ -260,11 +181,11 @@ const App = () => {
               <Sparkles className="w-3 h-3" />
               <span>Personal Brand Excellence</span>
             </div>
-            <h1 className="text-5xl md:text-9xl font-black tracking-tighter text-white mb-8 leading-[0.9] uppercase">
+            <h1 className="text-5xl md:text-9xl font-black tracking-tighter text-white mb-8 leading-[0.9] uppercase drop-shadow-2xl">
               LOOK <span className="text-amber-500">LEGIT</span> <br className="hidden md:block" /> 
               <span className="text-white/90">EVERYWHERE.</span>
             </h1>
-            <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-2xl mx-auto font-light">
+            <p className="text-xl md:text-2xl text-slate-200 mb-12 leading-relaxed max-w-2xl mx-auto font-light px-4 md:px-0 drop-shadow-md">
               Stop using messy bio links. I build <span className="text-white font-bold underline decoration-amber-500 underline-offset-8 decoration-4">high-performance</span> splash pages for leaders.
             </p>
             <GlowingButton onClick={() => setView('contact')} theme="gold" className="w-full md:w-auto">
@@ -283,7 +204,7 @@ const App = () => {
               <div className="relative">
                 <div className="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 blur-[60px] rounded-full" />
                 <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 md:mb-8">The Authority</h2>
-                <p className="text-3xl md:text-6xl font-black leading-[1.1] mb-6 md:mb-8">
+                <p className="text-3xl md:text-6xl font-black leading-[1.1] mb-6 md:mb-8 text-white uppercase">
                   I replace <span className="text-slate-500">cluttered links</span> with professional power.
                 </p>
                 <div className="h-1 w-20 bg-amber-500" />
@@ -350,17 +271,15 @@ const App = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-stretch relative">
-              {/* Background Halo for Callista Card */}
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-1/2 h-full bg-amber-500/5 blur-[120px] rounded-full pointer-events-none hidden lg:block" />
               
-              {/* Traditional Card */}
-              <div className="bg-slate-900/50 p-8 md:p-12 rounded-t-[40px] lg:rounded-tr-none lg:rounded-l-[40px] border border-white/5 border-b-0 lg:border-b lg:border-r-0 relative z-10">
+              <div className="bg-slate-900/50 p-8 md:p-12 rounded-t-[40px] lg:rounded-tr-none lg:rounded-l-[40px] border border-white/10 group shadow-lg relative z-10">
                 <div className="flex items-center space-x-4 mb-10">
                    <div className="p-3 bg-slate-800 rounded-xl">
                       <Home className="w-6 h-6 text-slate-500" />
                    </div>
                    <div>
-                     <h4 className="text-xl font-bold text-slate-300">Traditional Hosting</h4>
+                     <h4 className="text-xl font-bold text-slate-200">Traditional Hosting</h4>
                      <p className="text-[9px] text-slate-500 uppercase tracking-widest font-black">"The Single House"</p>
                    </div>
                 </div>
@@ -386,9 +305,7 @@ const App = () => {
                 </div>
               </div>
 
-              {/* Callista Card */}
               <div className="relative bg-slate-900 p-8 md:p-12 rounded-b-[40px] lg:rounded-bl-none lg:rounded-r-[40px] border-2 border-amber-500/30 shadow-[0_0_100px_rgba(212,175,55,0.08)] overflow-hidden z-20">
-                {/* Internal highlight glow */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[100px] pointer-events-none" />
                 
                 <div className="flex items-center space-x-4 mb-10 relative z-10">
@@ -427,7 +344,6 @@ const App = () => {
               <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.5em] text-amber-500/80">
                 Modern businesses don't run on single servers anymore.
               </p>
-              
               <div className="max-w-4xl mx-auto">
                 <p className="text-slate-400 text-sm md:text-base font-light italic leading-relaxed px-4">
                   “Our client sites are hosted on the same global edge infrastructure used by modern streaming platforms and SaaS companies — meaning ultra-fast load times, automatic scaling, and zero downtime.”
@@ -468,21 +384,21 @@ const App = () => {
       <section className="px-6 py-32 max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="grid grid-cols-1 lg:grid-cols-2 bg-slate-900 rounded-[60px] border border-white/5 overflow-hidden">
-            <div className="p-10 md:p-24 flex flex-col justify-center">
+            <div className="p-10 md:p-24 flex flex-col justify-center order-2 lg:order-1">
                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8">The Studio</h2>
                <p className="text-3xl md:text-4xl font-bold leading-tight mb-8">
-                I help creators replace cluttered bio links with a <span className="italic underline decoration-amber-500 decoration-4">clean brand page.</span>
+                I help creators replace cluttered bio links with a <span className="italic underline decoration-amber-500 decoration-4 text-white">clean brand page.</span>
                </p>
-               <p className="text-slate-400 text-lg font-light leading-relaxed">
-                 My goal is simple: make you look legit online and give people one clear place to go next—without funnels, tech overwhelm, or complicated systems.
+               <p className="text-slate-400 text-lg font-light leading-relaxed mb-10">
+                 My goal is simple: make you look legit online and give people one clear place to go next.
                </p>
-               <div className="mt-8 flex items-center space-x-3">
+               <div className="flex items-center space-x-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">CALLISTA DIGITAL STRATEGY</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 uppercase font-black">Callista Digital Strategy</p>
                </div>
             </div>
-            <div className="relative min-h-[400px] md:min-h-[600px] bg-slate-950 overflow-hidden">
-                {aboutImage && <img src={aboutImage} alt="Founder" className="w-full h-full object-cover opacity-80" />}
+            <div className="relative min-h-[400px] md:min-h-[600px] bg-slate-950 overflow-hidden order-1 lg:order-2">
+                <img src={WOMAN_IMAGE} alt="Founder" className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
             </div>
           </div>
@@ -500,9 +416,8 @@ const App = () => {
                Get Your Page Built
                <ArrowRight className="ml-2 w-5 h-5" />
             </GlowingButton>
-            <p className="mt-10 text-sm text-slate-500 font-medium text-center">
-              Founders pricing is available for a limited time. <br/>
-              <span className="italic">No pressure — if it’s not a fit, I’ll tell you.</span>
+            <p className="mt-10 text-sm text-slate-500 font-medium text-center italic">
+              Founder's pricing is available for a limited time.
             </p>
           </div>
         </ScrollReveal>
@@ -513,9 +428,7 @@ const App = () => {
         <div className="max-w-xl mx-auto">
           <Instagram className="w-10 h-10 mx-auto mb-10 text-slate-500 hover:text-amber-500 transition-colors cursor-pointer" />
           <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.3em] text-slate-600 font-bold uppercase space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-2">
-              <span>CALLISTA DIGITAL</span>
-            </div>
+            <span>CALLISTA DIGITAL</span>
             <span>EST. 2014 • CLEAN PAGES. CLEAR NEXT STEPS.</span>
           </div>
         </div>
@@ -526,7 +439,7 @@ const App = () => {
   const PageTwo = () => (
     <div className="min-h-screen bg-slate-950 flex flex-col text-white selection:bg-amber-500/30 font-sans">
       <Header />
-      <main className="flex-grow pt-32 pb-24 px-6 max-w-5xl mx-auto w-full">
+      <main className="flex-grow pt-32 pb-24 px-6 max-w-7xl mx-auto w-full">
         
         {/* Pricing Header */}
         <ScrollReveal>
@@ -536,7 +449,7 @@ const App = () => {
             </div>
             <h1 className="text-5xl md:text-8xl font-black text-white mb-6 tracking-tighter leading-none uppercase">
               PRICING <br/>
-              <span className="text-amber-500">STRUCTURE.</span>
+              <span className="text-amber-500 uppercase font-black tracking-tight">Structure.</span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed italic">
               Simple. Clear. Built for social-first businesses.
@@ -544,164 +457,162 @@ const App = () => {
           </div>
         </ScrollReveal>
 
-        {/* Intro Text */}
-        <ScrollReveal>
-          <div className="max-w-3xl mx-auto text-center mb-32 space-y-6">
-            <p className="text-2xl font-bold leading-tight">
-              I build clean, professional personal brand pages designed to replace messy bio links and guide people to one clear next step.
-            </p>
-            <p className="text-slate-500 text-lg font-light uppercase tracking-widest">
-              No funnels. No forms. No overcomplication.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        {/* One-Time Setup Section */}
+        {/* Build Tiers Grid */}
         <section className="mb-40">
           <ScrollReveal>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6">One-Time Setup</h2>
-                <h3 className="text-4xl md:text-6xl font-black mb-8 leading-none">PERSONAL BRAND <br/> PAGE BUILD.</h3>
-                <p className="text-slate-400 text-lg font-light leading-relaxed mb-10">
-                  This build is standardized on purpose. It allows me to deliver quickly, consistently, and at an affordable price.
-                </p>
-                <div className="space-y-4 mb-10">
-                  {[
-                    "A custom 2-page personal brand website",
-                    "Page 1: Brand + credibility + clarity",
-                    "Page 2: Clear next step (DM, call, link, etc.)",
-                    "Mobile-first, premium design",
-                    "Built specifically for social media traffic",
-                    "Hosted setup and launch",
-                    "Works for travel reps, creators, and online businesses"
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex items-start space-x-3">
-                      <CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                      <span className="text-slate-300 text-base">{item}</span>
+            <div className="text-center mb-16">
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-4">The Build</h2>
+              <h3 className="text-4xl font-black tracking-tight uppercase">Setup & Launch.</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+              {/* Founder's Special (2-Page) */}
+              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border-2 border-amber-500/40 flex flex-col shadow-2xl">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-xl whitespace-nowrap">
+                  Founder's Special
+                </div>
+                <div className="flex flex-col items-center text-center mb-10 pt-4">
+                  <span className="text-slate-500 text-sm font-bold line-through mb-1">REGULAR $997</span>
+                  <div className="flex items-center">
+                    <span className="text-2xl font-black text-slate-500 mr-1">$</span>
+                    <span className="text-6xl font-black text-white tracking-tighter">797</span>
+                  </div>
+                  <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-4">One-Time Setup</p>
+                </div>
+                
+                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">2-Page Brand Build</h4>
+                <div className="space-y-4 mb-10 flex-grow">
+                  {["Brand + Clarity Landing", "Next-Step Action Page", "Mobile-First Design", "Hosted Setup & Launch", "Strategic Layout"].map((f, i) => (
+                    <div key={i} className="flex items-start space-x-3">
+                      <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <span className="text-slate-400 text-xs font-medium">{f}</span>
                     </div>
                   ))}
                 </div>
+                <GlowingButton variant="none" className="w-full py-5 text-sm" onClick={() => document.getElementById('monthly-plans-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                   Secure My Build
+                </GlowingButton>
               </div>
 
-              <div className="relative group" id="pricing-card">
-                <div className="absolute inset-0 bg-amber-500/10 blur-[100px] opacity-20" />
-                <div className="relative bg-slate-900 p-10 md:p-12 border-2 border-amber-500/30 rounded-[48px] text-center shadow-3xl">
-                  <div className="inline-flex items-center space-x-2 px-4 py-1.5 mb-8 text-[10px] font-black tracking-[0.3em] uppercase bg-amber-500 text-slate-950 rounded-full shadow-lg">
-                    <Sparkles className="w-3 h-3" />
-                    <span>Founder's Pricing</span>
+              {/* Premium Build (3-Page) */}
+              <div className="bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/5 flex flex-col">
+                <div className="flex flex-col items-center text-center mb-10 pt-4">
+                  <div className="flex items-center">
+                    <span className="text-2xl font-black text-slate-500 mr-1">$</span>
+                    <span className="text-6xl font-black text-white tracking-tighter">1497</span>
                   </div>
-                  <div className="flex flex-col items-center mb-10">
-                    <span className="text-slate-500 text-xl font-bold line-through mb-2">$497 Normal</span>
-                    <div className="flex items-center">
-                      <span className="text-3xl font-black text-slate-500 mt-[-20px] mr-1">$</span>
-                      <span className="text-8xl font-black text-white tracking-tighter">297</span>
-                    </div>
-                    <p className="mt-4 text-[10px] text-amber-500/60 font-black uppercase tracking-widest">Increases to $497 After Feb 1</p>
-                  </div>
-                  
-                  <div className="bg-slate-950/50 p-6 rounded-3xl border border-white/5 mb-10">
-                    <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-4 flex items-center justify-center">
-                      <Clock className="w-3 h-3 mr-2" />
-                      Offer Ends In
-                    </p>
-                    <CountdownTimer targetDate="February 1, 2026 00:00:00" />
-                  </div>
-
-                  {/* Updated button to scroll to monthly plans */}
-                  <GlowingButton 
-                    variant="none" 
-                    className="w-full py-6 text-xl" 
-                    onClick={() => document.getElementById('monthly-plans-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  >
-                    Secure Your Build
-                  </GlowingButton>
-                  <p className="mt-6 text-[10px] text-slate-600 font-bold uppercase tracking-widest text-center">
-                    <ShieldCheck className="w-4 h-4 inline mr-2 text-amber-500" />
-                    Select a support plan below
-                  </p>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-4">Premium Setup</p>
                 </div>
+                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">3-Page Custom Site</h4>
+                <div className="space-y-4 mb-10 flex-grow">
+                  {["Everything in Founder's", "Custom Interior Page", "Enhanced Visual Content", "Priority Strategy Session", "Custom Brand Styling"].map((f, i) => (
+                    <div key={i} className="flex items-start space-x-3">
+                      <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <span className="text-slate-400 text-xs font-medium">{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('monthly-plans-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                   Select Premium
+                </GlowingButton>
+              </div>
+
+              {/* Enterprise Build (5-Page) */}
+              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/10 flex flex-col overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 blur-3xl pointer-events-none" />
+                
+                <div className="flex flex-col items-center text-center mb-10 pt-4">
+                  <div className="flex items-center">
+                    <span className="text-2xl font-black text-slate-500 mr-1">$</span>
+                    <span className="text-6xl font-black text-white tracking-tighter">2397</span>
+                  </div>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-4">Authority Setup</p>
+                </div>
+                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">Complete Presence</h4>
+                <div className="space-y-4 mb-10 flex-grow">
+                  {[
+                    "Full 5-Page Architecture",
+                    "Integrated Professional Blog",
+                    "SEO & AEO Optimized (AI Search)",
+                    "Premium Site Management",
+                    "Advanced Multi-Page Flow"
+                  ].map((f, i) => (
+                    <div key={i} className="flex items-start space-x-3">
+                      <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <span className="text-slate-400 text-xs font-medium">{f}</span>
+                    </div>
+                  ))}
+                  <div className="pt-4 border-t border-white/5 space-y-3">
+                    <div className="flex items-start space-x-3">
+                       <FileText className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                       <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+                         $50 per professional blog post
+                       </span>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                       <Search className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                       <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+                         Optimized for Perplexity, ChatGPT & Gemini
+                       </span>
+                    </div>
+                  </div>
+                </div>
+                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('monthly-plans-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                   Select Enterprise
+                </GlowingButton>
               </div>
             </div>
           </ScrollReveal>
         </section>
 
-        {/* Monthly Plans Section */}
+        {/* Professional Support Section */}
         <section className="mb-40" id="monthly-plans-section">
           <ScrollReveal>
-            <div className="text-center mb-20">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6">Monthly Plans</h2>
-              <h3 className="text-4xl md:text-5xl font-black mb-6">ONGOING SUPPORT.</h3>
-              <p className="text-slate-400 text-lg font-light max-w-2xl mx-auto leading-relaxed">
-                Your monthly plan determines ongoing support, not the quality of the build. All sites are built to the same standard.
+            <div className="text-center mb-16">
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6">Ongoing Support</h2>
+              <h3 className="text-4xl md:text-5xl font-black mb-6 uppercase tracking-tight">PROFESSIONAL MANAGEMENT.</h3>
+              <p className="text-slate-400 text-lg font-light max-w-2xl mx-auto">
+                One flat rate for peace of mind. Your monthly plan ensures your site remains fast, secure, and up-to-date while you stay focused on your business.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { 
-                  name: "Starter", 
-                  price: "$10", 
-                  color: "border-green-500/20", 
-                  icon: "🟢",
-                  desc: "Best if you never plan to make changes.",
-                  features: ["Secure hosting + uptime", "Page stays live", "Image hosting", "Your link remains active"],
-                  not: "❌ No edits or updates included",
-                  reason: "Choose this if your page is “set it and forget it.”",
-                  btnText: "Select Starter"
-                },
-                { 
-                  name: "Managed", 
-                  price: "$29", 
-                  color: "border-amber-500/50", 
-                  icon: "⭐",
-                  popular: true,
-                  desc: "Best for active reps and creators.",
-                  features: ["Everything in Starter", "1 small edit per month", "Text or image swaps", "Link or button updates", "Email or DM support"],
-                  reason: "Peace of mind without needing to think about your site.",
-                  btnText: "Choose Managed"
-                },
-                { 
-                  name: "Pro", 
-                  price: "$49", 
-                  color: "border-blue-500/20", 
-                  icon: "🔵",
-                  desc: "Best if you want it handled for you.",
-                  features: ["Everything in Managed", "Up to 3 small edits per month", "Priority turnaround", "Light guidance on updates"],
-                  reason: "Ideal if you want to stay focused on your business, not your website.",
-                  btnText: "Select Pro"
-                }
-              ].map((plan, i) => (
-                <div key={i} className={`relative p-8 rounded-[40px] bg-slate-900 border-2 ${plan.color} flex flex-col h-full overflow-hidden shadow-xl hover:scale-[1.02] transition-transform`}>
-                  {plan.popular && <div className="absolute top-5 right-5 bg-amber-500 text-slate-950 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Most Popular</div>}
-                  <div className="text-3xl mb-4">{plan.icon}</div>
-                  <h4 className="text-2xl font-black mb-1">{plan.name}</h4>
-                  <div className="flex items-baseline mb-6">
-                    <span className="text-3xl font-black">{plan.price}</span>
-                    <span className="text-slate-500 text-xs font-bold ml-1 tracking-widest uppercase">/ month</span>
+            <div className="max-w-md mx-auto">
+              <div className="relative p-10 rounded-[48px] bg-slate-900 border-2 border-amber-500/20 shadow-3xl flex flex-col text-center hover:border-amber-500/40 transition-colors">
+                <div className="flex flex-col items-center mb-10">
+                  <div className="flex items-baseline">
+                    <span className="text-2xl font-black text-slate-500 mr-1">$</span>
+                    <span className="text-7xl font-black text-white tracking-tighter">49</span>
+                    <span className="text-slate-500 text-xs font-black ml-2 uppercase tracking-widest">/ month</span>
                   </div>
-                  <p className="text-slate-400 text-sm font-medium mb-8 leading-relaxed italic">{plan.desc}</p>
-                  
-                  <div className="space-y-4 mb-10 flex-grow">
-                    {plan.features.map((f, j) => (
-                      <div key={j} className="flex items-start space-x-3">
-                        <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0 mt-0.5 opacity-60" />
-                        <span className="text-slate-300 text-xs font-medium">{f}</span>
-                      </div>
-                    ))}
-                    {plan.not && <div className="text-slate-600 text-[10px] font-bold uppercase tracking-widest pt-2">{plan.not}</div>}
-                  </div>
-
-                  <div className="mt-auto pt-6 border-t border-white/5 space-y-6">
-                    <GlowingButton variant="none" small className="w-full py-4 text-xs tracking-widest uppercase" onClick={() => window.open('https://instagram.com/travelprox', '_blank')}>
-                      {plan.btnText}
-                    </GlowingButton>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">
-                      {plan.reason}
-                    </p>
-                  </div>
+                  <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-4 italic">Standard for all active builds</p>
                 </div>
-              ))}
+                
+                <div className="space-y-4 mb-10 text-left">
+                  {[
+                    "Global edge network hosting",
+                    "Secure SSL & uptime monitoring",
+                    "Unlimited global bandwidth",
+                    "1 Professional edit per month",
+                    "Text or image swaps included",
+                    "DM or Email technical support"
+                  ].map((f, i) => (
+                    <div key={i} className="flex items-start space-x-3">
+                      <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <span className="text-slate-300 text-xs font-medium">{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <GlowingButton variant="none" className="w-full py-5 text-sm uppercase tracking-widest font-black" onClick={() => window.open('https://instagram.com/travelprox', '_blank')}>
+                   Start Support Plan
+                </GlowingButton>
+                
+                <div className="mt-8 pt-8 border-t border-white/5">
+                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">
+                     Peace of mind without needing to think about your site.
+                   </p>
+                </div>
+              </div>
             </div>
           </ScrollReveal>
         </section>
@@ -711,9 +622,9 @@ const App = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-slate-900/50 p-10 md:p-16 rounded-[48px] border border-white/5 mb-40">
             <div>
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6">Policy</h2>
-              <h3 className="text-3xl md:text-4xl font-black mb-6 uppercase">WHAT COUNTS AS A <br/> “SMALL EDIT”?</h3>
+              <h3 className="text-3xl md:text-4xl font-black mb-6 uppercase tracking-tight">WHAT COUNTS AS A <br/> “SMALL EDIT”?</h3>
               <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
-                These are available separately or as part of a custom build if your needs grow beyond a splash page.
+                Edits are handled quickly and professionally. Significant growth projects are available separately.
               </p>
             </div>
             <div className="space-y-10">
@@ -721,7 +632,7 @@ const App = () => {
                 <p className="text-[10px] font-black text-white uppercase tracking-widest flex items-center">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" /> Includes:
                 </p>
-                <div className="grid grid-cols-1 gap-2 text-slate-400 text-sm">
+                <div className="grid grid-cols-1 gap-2 text-slate-400 text-sm font-medium">
                   <span>• Updating existing text</span>
                   <span>• Swapping an image</span>
                   <span>• Changing a link or button</span>
@@ -731,11 +642,11 @@ const App = () => {
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
                   <XCircle className="w-4 h-4 mr-2" /> Does not include:
                 </p>
-                <div className="grid grid-cols-1 gap-2 text-slate-500 text-sm">
-                  <span>• Full redesigns</span>
+                <div className="grid grid-cols-1 gap-2 text-slate-500 text-sm font-medium">
+                  <span>• Full site redesigns</span>
                   <span>• New additional pages</span>
                   <span>• Copy rewrites or branding</span>
-                  <span>• Strategy or marketing funnels</span>
+                  <span>• Custom strategy or funnels</span>
                 </div>
               </div>
             </div>
@@ -750,9 +661,9 @@ const App = () => {
                 <Globe className="w-64 h-64 text-amber-500" />
               </div>
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8">Custom Solutions</h2>
-              <h3 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter text-center uppercase">ENTERPRISE BUILDS.</h3>
+              <h3 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter text-center uppercase">CUSTOM ARCHITECTURE.</h3>
               <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12">
-                For businesses that need personal hosting, 5+ pages, or fully custom designs. These projects are offered selectively to ensure quality.
+                For businesses that need personal hosting, high-volume architecture, or fully custom designs. These projects are offered selectively to ensure quality.
               </p>
               
               <div className="flex flex-col items-center">
