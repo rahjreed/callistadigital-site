@@ -34,7 +34,7 @@ import {
   Minimize2
 } from 'lucide-react';
 
-// Your Google AI Studio API Key is now integrated
+// Integrated your Google AI Studio API Key
 const apiKey = "AIzaSyCGTS5q7d8o3W5bPlSp0O-z1d1ZIE-w-RI";
 
 // --- ChatBot Component ---
@@ -54,23 +54,23 @@ const ChatBot = ({ messages, setMessages }) => {
     const userMsgCount = messages.filter(m => m.role === 'user').length + 1;
     
     let contactInstruction = "";
-    // Recommend contact on the 2nd question, and every 3rd question after that
     if (userMsgCount === 2 || (userMsgCount > 2 && (userMsgCount - 2) % 3 === 0)) {
-       contactInstruction = "\n\nREQUIRED ACTION: You must now end this specific message by telling the user the best way to get started is to email hello@callistadigital.com or DM @callistadigital on Instagram.";
+       contactInstruction = "\n\nREQUIRED ACTION: You must now end this specific message by telling the user the best way to get started is to email hello@callistadigital.com or @callistadigital on Instagram.";
     }
 
     const systemPrompt = `You are a professional Digital Strategist for Callista Digital. 
-    Services:
-    - 2-Page Brand Build: $797 (Founder's Special). Focus: Clarity and conversion.
-    - 3-Page Custom Site: $1497. Focus: Custom interior content and depth.
-    - 5-Page Complete Presence: $2397. Includes a blog, premium management, and AEO optimization (AI Search).
-    - Support: One flat rate of $49/mo for hosting, updates, and maintenance.
+    Our pricing and structure:
+    - 2-Page Brand Build: $797 (Founder's Special).
+    - 3-Page Custom Site: $1497.
+    - 5-Page Complete Presence: $2397 (Includes blog, SEO/AEO optimization).
+    - Support: One flat rate of $49/mo.
     
-    CRITICAL FORMATTING RULES:
-    - Communicate in PLAIN TEXT ONLY.
-    - NEVER use hashtags (#), bolding symbols (**), or tables.
-    - Do not use markdown. Use simple line breaks for space between paragraphs.
-    - Be elite, professional, and minimalist in your tone.
+    STRICT FORMATTING RULES:
+    - NO Markdown. NO bolding (**), NO headers (###), NO tables (|).
+    - Communicating in PLAIN TEXT ONLY.
+    - Use simple line breaks for paragraphs.
+    - Use simple dashes (-) for lists if absolutely needed.
+    - Tone: Elite, authoritative, minimalist. Use "We" instead of "I".
     ${contactInstruction}`;
 
     try {
@@ -84,13 +84,22 @@ const ChatBot = ({ messages, setMessages }) => {
       });
       
       const data = await response.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm having trouble connecting right now. Please email hello@callistadigital.com!";
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "We are having trouble connecting to the network. Please email us at hello@callistadigital.com.";
       
-      // Secondary cleanup to ensure no markdown slips through to the UI
-      return rawText.replace(/[#*_|]/g, '');
+      // AGGRESSIVE CLEANUP: Strips all markdown symbols to ensure a clean UI
+      const cleanText = rawText
+        .replace(/[#*|_~]/g, '') 
+        .replace(/\[.*?\]/g, '')
+        .trim();
+        
+      return cleanText;
     } catch (error) {
-      if (retryCount < 3) return callGemini(userQuery, retryCount + 1);
-      return "I'm experiencing a brief network interruption. Please reach out to us directly at hello@callistadigital.com!";
+      if (retryCount < 5) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        await new Promise(r => setTimeout(r, delay));
+        return callGemini(userQuery, retryCount + 1);
+      }
+      return "We are experiencing a connection delay. Please reach out to us directly at hello@callistadigital.com.";
     }
   };
 
@@ -119,7 +128,7 @@ const ChatBot = ({ messages, setMessages }) => {
           <div ref={scrollRef} className="flex-grow p-5 overflow-y-auto space-y-4 scrollbar-hide">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg ${m.role === 'user' ? 'bg-amber-500 text-slate-950 rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-white/5'}`}>
+                <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg ${m.role === 'user' ? 'bg-amber-500 text-slate-950 rounded-tr-none font-medium' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-white/5'}`}>
                   {m.text}
                 </div>
               </div>
@@ -133,8 +142,8 @@ const ChatBot = ({ messages, setMessages }) => {
             )}
           </div>
           <div className="p-4 bg-slate-950 border-t border-white/5 flex space-x-2">
-            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask a question..." className="flex-grow bg-slate-900 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none placeholder:text-slate-600" />
-            <button onClick={handleSend} disabled={isLoading} className="p-2 bg-amber-500 rounded-full text-slate-950 hover:scale-105 transition-transform disabled:opacity-50"><Send className="w-4 h-4" /></button>
+            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask a question..." className="flex-grow bg-slate-900 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none" />
+            <button onClick={handleSend} disabled={isLoading} className="p-2 bg-amber-500 rounded-full text-slate-950 hover:scale-105 transition-all"><Send className="w-4 h-4" /></button>
           </div>
         </div>
       ) : (
@@ -180,7 +189,7 @@ const GlowingButton = ({ onClick, children, className = "", isLink = false, href
 const App = () => {
   const [view, setView] = useState('home');
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', text: "Hi, I'm your Callista Digital strategist. How can I help you level up your online presence today?" }
+    { role: 'assistant', text: "Hi, we are your Callista Digital strategists. How can we help you level up your online presence today?" }
   ]);
   
   const HERO_IMAGE = "https://images.travelprox.com/callista/cdhero.png";
@@ -220,7 +229,9 @@ const App = () => {
               <Sparkles className="w-3 h-3" /><span>Personal Brand Excellence</span>
             </div>
             <h1 className="text-5xl md:text-9xl font-black tracking-tighter mb-8 leading-[0.9] uppercase drop-shadow-2xl">LOOK <span className="text-amber-500">LEGIT</span> <br className="hidden md:block" /><span className="text-white/90">EVERYWHERE.</span></h1>
-            <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-2xl mx-auto font-light px-4 md:px-0 text-center">Stop using messy bio links. I build <span className="text-white font-bold underline decoration-amber-500 underline-offset-8 decoration-4">high-performance</span> splash pages for leaders.</p>
+            <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-2xl mx-auto font-light px-4 md:px-0 text-center">
+              Where beautifully crafted design meets intelligent precision.
+            </p>
             <GlowingButton onClick={() => setView('pricing')} theme="gold">Get Your Page Built <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" /></GlowingButton>
           </ScrollReveal>
         </div>
@@ -233,11 +244,20 @@ const App = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
               <div className="relative">
                 <div className="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 blur-[60px] rounded-full" />
-                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white font-black">The Authority</h2>
-                <p className="text-3xl md:text-6xl font-black leading-[1.1] mb-8 text-white uppercase tracking-tight">I replace <span className="text-slate-500">cluttered links</span> with professional power.</p>
+                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white font-black">THE AUTHORITY</h2>
+                <p className="text-3xl md:text-6xl font-black leading-[1.1] mb-8 text-white uppercase tracking-tight">
+                  We turn digital chaos <br className="hidden md:block" /> into <span className="text-slate-500">elegant command.</span>
+                </p>
                 <div className="h-1 w-20 bg-amber-500" />
               </div>
-              <p className="text-lg md:text-xl text-slate-400 leading-relaxed font-light">Most online creators lose business because their "digital front door" is a mess. I design hosted personal brand splash pages that help you look professional and guide visitors to the next step instantly.</p>
+              <div className="space-y-6">
+                <p className="text-xl md:text-2xl text-white font-bold leading-relaxed">
+                  Your digital front door is your first impression.
+                </p>
+                <p className="text-lg md:text-xl text-slate-400 leading-relaxed font-light">
+                  We design beautifully crafted, hosted brand systems that make you look established, guide visitors effortlessly, and convert attention into action.
+                </p>
+              </div>
             </div>
           </ScrollReveal>
         </div>
@@ -310,10 +330,6 @@ const App = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-16 text-center space-y-8 px-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.5em] text-amber-500/80">Modern businesses don't run on single servers anymore.</p>
-              <p className="text-slate-400 text-sm italic max-w-4xl mx-auto leading-relaxed font-light">“Our client sites are hosted on the same global edge infrastructure used by modern streaming platforms and SaaS companies — meaning ultra-fast load times, automatic scaling, and zero downtime.”</p>
-            </div>
           </div>
         </ScrollReveal>
       </section>
@@ -322,204 +338,9 @@ const App = () => {
       <section className="px-6 py-24 bg-white text-slate-950 text-center shadow-2xl">
         <ScrollReveal>
           <div className="flex justify-center space-x-2 mb-10">
-            {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-8 h-8 md:w-12 md:h-12 text-amber-500 fill-amber-500" />)}
+            {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-8 h-8 md:w-12 md:h-12 text-amber-500 fill-amber-500 shadow-sm" />)}
           </div>
-          <h2 className="text-4xl md:text-7xl font-black mb-16 tracking-tighter uppercase leading-[0.9]">TRUSTED BY <br/> MODERN LEADERS.</h2>
+          <h2 className="text-4xl md:text-7xl font-black mb-16 tracking-tighter uppercase text-slate-950 leading-[0.9]">TRUSTED BY <br/> MODERN LEADERS.</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left max-w-6xl mx-auto">
             {[{ l: "Experience", v: "10+ Years" }, { l: "Focus", v: "Conversion" }, { l: "Systems", v: "Custom Built" }].map((stat, i) => (
-              <div key={i} className="border-t-4 border-slate-950 pt-8 shadow-sm"><p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">{stat.l}</p><p className="text-3xl font-black">{stat.v}</p></div>
-            ))}
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* Founder Profile */}
-      <section className="px-6 py-32 max-w-6xl mx-auto">
-        <ScrollReveal>
-          <div className="grid grid-cols-1 lg:grid-cols-2 bg-slate-900 rounded-[60px] border border-white/5 overflow-hidden shadow-2xl">
-            <div className="p-10 md:p-24 flex flex-col justify-center order-2 lg:order-1 font-sans">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 tracking-widest">The Studio</h2>
-              <p className="text-3xl md:text-4xl font-bold leading-tight mb-8 text-white">I help creators replace cluttered bio links with a <span className="italic underline decoration-amber-500 decoration-4 text-white">clean brand page.</span></p>
-              <p className="text-slate-400 text-lg font-light mb-10 leading-relaxed">My goal is simple: make you look legit online and give people one clear place to go next.</p>
-              <div className="flex items-center space-x-3 uppercase"><div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /><p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 font-black tracking-widest">Callista Digital Strategy</p></div>
-            </div>
-            <div className="relative min-h-[400px] md:min-h-[600px] bg-slate-950 overflow-hidden order-1 lg:order-2">
-              <img src={WOMAN_IMAGE} alt="Founder" className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105 opacity-80" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
-            </div>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* CTA Section */}
-      <section className="px-6 py-24 md:py-32 bg-slate-950 text-center">
-        <ScrollReveal>
-          <h2 className="text-4xl md:text-6xl font-black mb-12 uppercase tracking-tighter leading-[0.9]">READY TO <br/> <span className="text-amber-500 uppercase">GET STARTED?</span></h2>
-          <GlowingButton onClick={() => setView('pricing')}>Get Your Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
-          <p className="mt-10 text-sm text-slate-500 italic font-light tracking-wide">Founder's pricing is available for a limited time.</p>
-        </ScrollReveal>
-      </section>
-
-      <footer className="px-6 py-20 bg-black border-t border-white/5 text-center font-sans">
-        <div className="max-w-xl mx-auto">
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-block group mb-10">
-            <Instagram className="w-10 h-10 text-slate-500 group-hover:text-amber-500 transition-all transform group-hover:scale-110" />
-          </a>
-          <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.3em] text-slate-600 font-bold uppercase space-y-4">
-            <span>CALLISTA DIGITAL</span><span>EST. 2014 • CLEAN PAGES. CLEAR NEXT STEPS.</span>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-
-  const PageTwo = () => (
-    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-amber-500/30 overflow-x-hidden">
-      <Header />
-      <main className="pt-32 pb-24 px-6 max-w-7xl mx-auto w-full">
-        <ScrollReveal>
-          <div className="text-center mb-24">
-            <div className="inline-block p-4 rounded-3xl bg-slate-900 border border-white/10 shadow-2xl mb-8 animate-bounce"><ShoppingBag className="w-10 h-10 text-amber-500" /></div>
-            <h1 className="text-5xl md:text-8xl font-black mb-6 uppercase tracking-tighter leading-[0.85]">PRICING <br/><span className="text-amber-500 uppercase font-black tracking-tight">Structure.</span></h1>
-            <p className="text-xl md:text-2xl text-slate-400 font-light max-w-2xl mx-auto italic leading-relaxed font-light px-4">Simple. Clear. Built for social-first businesses.</p>
-          </div>
-        </ScrollReveal>
-
-        {/* Setup Tiers - Fixed Overflow to Prevent Badge Clipping */}
-        <section className="mb-40 overflow-visible">
-          <ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 items-stretch mt-12 px-4 md:px-0 overflow-visible">
-              {/* Founder Card */}
-              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border-2 border-amber-500/40 flex flex-col shadow-2xl overflow-visible">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap shadow-xl z-30">Founder's Special</div>
-                <div className="text-center mb-10 pt-8">
-                  <span className="text-slate-500 text-sm font-bold line-through">REGULAR $997</span>
-                  <div className="flex justify-center items-center mt-1 font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">797</span></div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase mt-4 tracking-widest">One-Time Setup</p>
-                </div>
-                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">2-Page Brand Build</h4>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
-                  {["Brand + Clarity Landing", "Next-Step Action Page", "Mobile-First Design", "Hosted Setup & Launch", "Strategic Layout"].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
-                  ))}
-                </div>
-                <GlowingButton variant="none" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Secure My Build</GlowingButton>
-              </div>
-
-              {/* Premium Card */}
-              <div className="bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/5 flex flex-col shadow-lg">
-                <div className="text-center mb-10 pt-8">
-                  <div className="flex justify-center items-center font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">1497</span></div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest">Premium Setup</p>
-                </div>
-                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">3-Page Custom Site</h4>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
-                  {["Everything in Founder's", "Custom Interior Page", "Enhanced Visual Content", "Priority Strategy Session", "Custom Brand Styling"].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
-                  ))}
-                </div>
-                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Select Premium</GlowingButton>
-              </div>
-
-              {/* Enterprise Card */}
-              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/10 flex flex-col shadow-lg overflow-visible">
-                <div className="text-center mb-10 pt-8">
-                  <div className="flex justify-center items-center font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">2397</span></div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest">Authority Setup</p>
-                </div>
-                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight text-white">Complete Presence</h4>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
-                  {[
-                    "Full 5-Page Architecture",
-                    "Integrated Professional Blog",
-                    "SEO & AEO Optimized (AI Search)",
-                    "Premium Site Management",
-                    "Advanced Multi-Page Flow"
-                  ].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
-                  ))}
-                  <div className="pt-4 border-t border-white/5 space-y-3">
-                    <div className="flex items-center space-x-3 text-slate-500"><FileText className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase tracking-widest">$50/Professional Blog Post</span></div>
-                    <div className="flex items-center space-x-3 text-slate-500"><Search className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase text-amber-500/80 tracking-widest">Optimized for AI Search</span></div>
-                  </div>
-                </div>
-                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Select Enterprise</GlowingButton>
-              </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Unified Support Section */}
-        <section className="mb-40" id="support-plan">
-          <ScrollReveal>
-            <div className="text-center mb-16 max-w-md mx-auto px-4">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">Ongoing Support</h2>
-              <div className="relative p-10 rounded-[48px] bg-slate-900 border-2 border-amber-500/20 shadow-3xl text-center hover:border-amber-500/40 transition-all group">
-                <div className="flex flex-col items-center mb-10">
-                  <div className="flex items-baseline font-sans"><span className="text-2xl font-black text-slate-500 mr-1">$</span><span className="text-7xl font-black text-white tracking-tighter">49</span><span className="text-slate-500 text-xs font-black ml-2 uppercase tracking-widest">/ month</span></div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase mt-4 italic tracking-widest font-black">Professional Management</p>
-                </div>
-                <div className="space-y-4 mb-10 text-left text-sm text-slate-300 font-medium">
-                  {["Global edge network hosting", "Secure SSL & uptime monitoring", "Unlimited global bandwidth", "1 Professional edit per month", "Text or image swaps included", "DM or Email technical support"].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500" /><span>{f}</span></div>
-                  ))}
-                </div>
-                <GlowingButton variant="none" className="w-full py-5 text-sm uppercase font-black tracking-widest" onClick={() => window.open(INSTAGRAM_URL, '_blank')}>Start Support Plan</GlowingButton>
-              </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Small Edit Policy */}
-        <ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-slate-900/50 p-10 md:p-16 rounded-[48px] border border-white/5 mb-40 shadow-xl mx-4 md:mx-0">
-            <div>
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">Policy</h2>
-              <h3 className="text-3xl md:text-4xl font-black mb-6 uppercase text-white tracking-tight leading-none">WHAT COUNTS AS A <br/> “SMALL EDIT”?</h3>
-              <p className="text-slate-500 text-sm leading-relaxed max-w-sm font-light italic">Professional management keeps your brand polished. Complex redesigns or new architecture are handled as separate strategic projects.</p>
-            </div>
-            <div className="space-y-10">
-              <div className="space-y-4">
-                <p className="text-[10px] font-black text-white uppercase flex items-center tracking-widest"><CheckCircle2 className="w-4 h-4 mr-2 text-green-500" /> Includes:</p>
-                <div className="grid gap-2 text-slate-400 text-sm font-medium"><span>• Updating existing text</span><span>• Swapping an image</span><span>• Changing a link or button</span></div>
-              </div>
-              <div className="space-y-4 opacity-60">
-                <p className="text-[10px] font-black text-slate-400 uppercase flex items-center tracking-widest"><XCircle className="w-4 h-4 mr-2 text-slate-600" /> Does not include:</p>
-                <div className="grid gap-2 text-slate-500 text-sm font-medium"><span>• Full site redesigns</span><span>• New additional pages</span><span>• Copy rewrites or branding</span><span>• Custom strategy or funnels</span></div>
-              </div>
-            </div>
-          </div>
-        </ScrollReveal>
-
-        {/* Enterprise/Custom Section */}
-        <section className="mb-40">
-          <ScrollReveal>
-            <div className="bg-amber-500/5 border border-amber-500/20 p-10 md:p-20 rounded-[60px] text-center relative overflow-hidden group shadow-2xl mx-4 md:mx-0">
-              <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none duration-1000"><Globe className="w-64 h-64 text-amber-500" /></div>
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black tracking-widest">Custom Solutions</h2>
-              <h3 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter uppercase leading-none">CUSTOM ARCHITECTURE.</h3>
-              <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12 px-4 italic">For businesses that need personal hosting, high-volume architecture, or fully custom designs. Projects offered selectively to ensure elite quality.</p>
-              <div className="flex flex-col items-center"><a href="mailto:hello@callistadigital.com" className="group flex items-center text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 border border-white/10 px-10 py-5 rounded-full hover:bg-black transition-all shadow-3xl hover:border-amber-500/30 font-black"><Mail className="w-4 h-4 mr-3 text-amber-500 group-hover:scale-110 transition-transform" />Email to request information</a></div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        <footer className="pt-20 pb-10 flex flex-col md:flex-row justify-between items-center text-[9px] tracking-[0.3em] text-slate-700 font-black border-t border-white/5 space-y-4 uppercase font-black">
-           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="group">
-            <Instagram className="w-6 h-6 text-slate-700 group-hover:text-amber-500 transition-colors" />
-           </a>
-           <span>CALLISTA DIGITAL © 2014 - 2026</span>
-        </footer>
-      </main>
-    </div>
-  );
-
-  return (
-    <div className="font-sans antialiased bg-slate-950 w-full overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
-      <ChatBot messages={chatMessages} setMessages={setChatMessages} />
-      {view === 'home' ? <PageOne /> : <PageTwo />}
-    </div>
-  );
-};
-
-export default App;
+              <div key={i} className="border-t-4 border-slate-950 pt-8 shadow-sm"><p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">{stat.l}</p><p className="text-3xl font-black">{stat.v}</p></d
