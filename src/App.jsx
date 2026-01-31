@@ -32,11 +32,13 @@ import {
   MessageSquare,
   Send,
   Minimize2,
-  PenTool
+  PenTool,
+  Quote
 } from 'lucide-react';
 
-// API Key variable preserved for general configuration if needed elsewhere
 const apiKey = "";
+const TEXT_LOGO = "https://images.travelprox.com/callista/textlogo.png";
+const FAVICON = "https://images.travelprox.com/callista/favicon.png";
 
 // --- ChatBot Component ---
 const ChatBot = ({ messages, setMessages }) => {
@@ -76,7 +78,6 @@ const ChatBot = ({ messages, setMessages }) => {
     ${contactInstruction}`;
 
     try {
-      // Replaced previous direct fetch with internal API routing
       const response = await fetch("/api/gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,7 +111,11 @@ const ChatBot = ({ messages, setMessages }) => {
         <div className="w-[320px] md:w-[380px] h-[500px] bg-slate-900 border border-amber-500/30 rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
           <div className="p-5 bg-slate-950 border-b border-white/5 flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center font-black text-slate-950 text-[10px]">CD</div>
+              <img 
+                src={FAVICON} 
+                alt="Favicon" 
+                className="w-8 h-8 rounded-lg border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.3)] object-contain" 
+              />
               <span className="text-xs font-black uppercase tracking-widest text-white">Strategist</span>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white transition-colors"><Minimize2 className="w-4 h-4" /></button>
@@ -191,8 +196,12 @@ const App = () => {
   const Header = () => (
     <nav className="fixed top-0 left-0 w-full z-50 px-4 py-4">
       <div className="max-w-6xl mx-auto flex justify-between items-center bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-full px-4 md:px-6 py-2 shadow-2xl">
-        <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => setView('home')}>
-          <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center transition-transform group-hover:rotate-12 font-black text-slate-950 text-[10px]">CD</div>
+        <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => setView('home')}>
+          <img 
+            src={FAVICON} 
+            alt="Callista" 
+            className="w-8 h-8 rounded-lg border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.4)] transition-all duration-300 group-hover:rotate-12 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.6)] object-contain bg-slate-900" 
+          />
           <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white">CALLISTA DIGITAL</span>
         </div>
         <div className="flex items-center space-x-4">
@@ -331,6 +340,64 @@ const App = () => {
         </ScrollReveal>
       </section>
 
+      {/* Social Proof Stats */}
+      <section className="px-6 py-24 bg-white text-slate-950 text-center shadow-2xl">
+        <ScrollReveal>
+          <div className="flex justify-center space-x-2 mb-10">
+            {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-8 h-8 md:w-12 md:h-12 text-amber-500 fill-amber-500" />)}
+          </div>
+          <h2 className="text-4xl md:text-7xl font-black mb-16 tracking-tighter uppercase leading-[0.9]">TRUSTED BY <br/> MODERN LEADERS.</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left max-w-6xl mx-auto">
+            {[{ l: "Experience", v: "10+ Years" }, { l: "Focus", v: "Conversion" }, { l: "Systems", v: "Custom Built" }].map((stat, i) => (
+              <div key={i} className="border-t-4 border-slate-950 pt-8 shadow-sm"><p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">{stat.l}</p><p className="text-3xl font-black">{stat.v}</p></div>
+            ))}
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* Social Proof Testimonials */}
+      <section className="px-6 py-24 md:py-32 bg-slate-950">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">Client Success</h2>
+              <h3 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-8 leading-none">REAL WORLD <span className="text-amber-500">RESULTS.</span></h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+              {/* Marcella V. - Vesper Catering Co. */}
+              <div className="bg-slate-900 p-8 md:p-12 rounded-[40px] border border-white/5 relative group hover:border-amber-500/30 transition-all duration-500 shadow-xl">
+                <Quote className="w-10 h-10 text-amber-500/20 absolute top-8 right-8 group-hover:text-amber-500/40 transition-colors" />
+                <div className="mb-8">
+                  <p className="text-lg md:text-xl text-slate-300 font-light leading-relaxed italic mb-8">
+                    "Our catering brand needed to look as premium as our menu. Callista Digital didn't just build a site; they built an elite digital presence that commands attention and converts inquiries into bookings effortlessly."
+                  </p>
+                  <div className="h-px w-12 bg-amber-500 mb-6" />
+                  <div>
+                    <p className="text-white font-black uppercase tracking-widest text-sm">Marcella V.</p>
+                    <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest mt-1">Founder, Vesper Catering Co.</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Elias K. - Nomad Horizon Club */}
+              <div className="bg-slate-900 p-8 md:p-12 rounded-[40px] border border-white/5 relative group hover:border-amber-500/30 transition-all duration-500 shadow-xl">
+                <Quote className="w-10 h-10 text-amber-500/20 absolute top-8 right-8 group-hover:text-amber-500/40 transition-colors" />
+                <div className="mb-8">
+                  <p className="text-lg md:text-xl text-slate-300 font-light leading-relaxed italic mb-8">
+                    "The scale of our travel club requires absolute precision. The systems Callista implemented are fast, secure, and established instant trust with our members. It’s intelligent design that actually scales."
+                  </p>
+                  <div className="h-px w-12 bg-amber-500 mb-6" />
+                  <div>
+                    <p className="text-white font-black uppercase tracking-widest text-sm">Elias K.</p>
+                    <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest mt-1">Founder, Nomad Horizon Club</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="px-6 py-24 md:py-32 bg-slate-950 text-center font-sans">
         <ScrollReveal>
@@ -346,7 +413,8 @@ const App = () => {
             <Instagram className="w-10 h-10 text-slate-500 group-hover:text-amber-500 transition-all transform group-hover:scale-110" />
           </a>
           <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.3em] text-slate-600 font-bold uppercase space-y-4">
-            <span>CALLISTA DIGITAL</span><span>EST. 2014 • CLEAN PAGES. CLEAR NEXT STEPS.</span>
+            <img src={TEXT_LOGO} alt="Callista Digital" className="h-4 w-auto opacity-40 brightness-200 grayscale" />
+            <span>EST. 2014 • CLEAN PAGES. CLEAR NEXT STEPS.</span>
           </div>
         </div>
       </footer>
@@ -365,11 +433,10 @@ const App = () => {
           </div>
         </ScrollReveal>
 
-        {/* Setup Tiers */}
+        {/* Pricing Tiers */}
         <section className="mb-40 overflow-visible pt-10">
           <ScrollReveal>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 items-stretch mt-12 px-4 md:px-0 overflow-visible">
-              {/* Founder Special */}
               <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border-2 border-amber-500/40 flex flex-col shadow-2xl overflow-visible">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap shadow-xl z-30">Founder's Special</div>
                 <div className="text-center mb-10 pt-8">
@@ -386,7 +453,6 @@ const App = () => {
                 <GlowingButton variant="none" className="w-full py-5 text-sm" onClick={() => window.open(INSTAGRAM_URL, '_blank')}>Secure Our Build</GlowingButton>
               </div>
 
-              {/* Premium */}
               <div className="bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/5 flex flex-col shadow-lg">
                 <div className="text-center mb-10 pt-8">
                   <div className="flex justify-center items-center font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">1497</span></div>
@@ -398,10 +464,9 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3 text-xs md:text-sm"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => window.open(INSTAGRAM_URL, '_blank')}>Select Premium</GlowingButton>
+                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Select Premium</GlowingButton>
               </div>
 
-              {/* Enterprise */}
               <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/10 flex flex-col shadow-lg overflow-visible">
                 <div className="text-center mb-10 pt-8">
                   <div className="flex justify-center items-center font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">2397</span></div>
@@ -419,17 +484,17 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                   <div className="pt-4 border-t border-white/5 space-y-3">
-                    <div className="flex items-center space-x-3 text-slate-500"><FileText className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase tracking-widest">$125/Professional Blog Post</span></div>
+                    <div className="flex items-center space-x-3 text-slate-500"><FileText className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase tracking-widest font-black">$125/Professional Blog Post</span></div>
                     <div className="flex items-center space-x-3 text-slate-500"><Search className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase text-amber-500/80 tracking-widest font-black">Optimized for AI Search</span></div>
                   </div>
                 </div>
-                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => window.open(INSTAGRAM_URL, '_blank')}>Select Enterprise</GlowingButton>
+                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Select Enterprise</GlowingButton>
               </div>
             </div>
           </ScrollReveal>
         </section>
 
-        {/* Management Plan - $125/mo */}
+        {/* Support Plan */}
         <section className="mb-40" id="support-plan">
           <ScrollReveal>
             <div className="text-center mb-16 max-w-md mx-auto px-4">
@@ -450,7 +515,7 @@ const App = () => {
           </ScrollReveal>
         </section>
 
-        {/* Blog Content Bundles */}
+        {/* Blog Bundles */}
         <section className="mb-40">
           <ScrollReveal>
             <div className="text-center mb-16">
@@ -482,11 +547,25 @@ const App = () => {
           </ScrollReveal>
         </section>
 
+        {/* Custom Section */}
+        <section className="mb-40">
+          <ScrollReveal>
+            <div className="bg-amber-500/5 border border-amber-500/20 p-10 md:p-20 rounded-[60px] text-center relative overflow-hidden group shadow-2xl mx-4 md:mx-0 flex flex-col items-center">
+              <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none duration-1000"><Globe className="w-64 h-64 text-amber-500" /></div>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black tracking-widest">CUSTOM SOLUTIONS</h2>
+              <h3 className="text-4xl md:text-8xl font-black mb-10 tracking-tighter uppercase leading-[0.9] text-white max-w-4xl text-center">CUSTOM <br className="md:hidden" /> ARCHITECTURE.</h3>
+              <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12 px-4 italic">For businesses that need personal hosting, high-volume architecture, or fully custom designs. Projects offered selectively to ensure elite quality.</p>
+              <div className="flex flex-col items-center"><a href="mailto:hello@callistadigital.com" className="group flex items-center text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 border border-white/10 px-10 py-5 rounded-full hover:bg-black transition-all shadow-3xl hover:border-amber-500/30 font-black"><Mail className="w-4 h-4 mr-3 text-amber-500 group-hover:scale-110 transition-transform" />Email to request information</a></div>
+            </div>
+          </ScrollReveal>
+        </section>
+
         <footer className="pt-20 pb-10 flex flex-col md:flex-row justify-between items-center text-[9px] tracking-[0.3em] text-slate-700 font-black border-t border-white/5 space-y-4 uppercase font-black px-4">
            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="group">
             <Instagram className="w-6 h-6 text-slate-700 group-hover:text-amber-500 transition-colors" />
            </a>
-           <span>CALLISTA DIGITAL © 2014 - 2026</span>
+           <img src={TEXT_LOGO} alt="Callista Digital" className="h-3 w-auto opacity-30 brightness-200 grayscale" />
+           <span>© 2014 - 2026</span>
         </footer>
       </main>
     </div>
