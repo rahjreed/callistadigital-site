@@ -33,12 +33,44 @@ import {
   Send,
   Minimize2,
   PenTool,
-  Quote
+  Quote,
+  Plus,
+  Minus
 } from 'lucide-react';
 
 const apiKey = "";
 const TEXT_LOGO = "https://images.travelprox.com/callista/textlogo.png";
 const FAVICON = "https://images.travelprox.com/callista/favicon.png";
+
+// --- FAQ Component ---
+const FAQItem = ({ question, answer, isOpen, onClick }) => {
+  const contentRef = useRef(null);
+  
+  return (
+    <div className="border-b border-white/10 overflow-hidden">
+      <button 
+        onClick={onClick}
+        className="w-full py-8 flex justify-between items-center text-left group transition-all"
+      >
+        <span className={`text-lg md:text-xl font-bold uppercase tracking-tight transition-colors ${isOpen ? 'text-amber-500' : 'text-white group-hover:text-amber-500/80'}`}>
+          {question}
+        </span>
+        <div className={`shrink-0 ml-4 p-2 rounded-full border transition-all ${isOpen ? 'bg-amber-500 border-amber-500 text-slate-950 rotate-0' : 'border-white/20 text-white rotate-0 group-hover:border-amber-500/50'}`}>
+          {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+        </div>
+      </button>
+      <div 
+        ref={contentRef}
+        style={{ height: isOpen ? contentRef.current?.scrollHeight : 0 }}
+        className="transition-all duration-300 ease-in-out overflow-hidden"
+      >
+        <div className="pb-8 text-slate-400 text-base md:text-lg leading-relaxed font-light whitespace-pre-line">
+          {answer}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // --- ChatBot Component ---
 const ChatBot = ({ messages, setMessages }) => {
@@ -185,6 +217,7 @@ const GlowingButton = ({ onClick, children, className = "", isLink = false, href
 // --- Main App ---
 const App = () => {
   const [view, setView] = useState('home');
+  const [openFaq, setOpenFaq] = useState(null);
   const [chatMessages, setChatMessages] = useState([
     { role: 'assistant', text: "Hi, we are your Callista Digital strategists. How can we help you level up your online presence today?" }
   ]);
@@ -194,6 +227,41 @@ const App = () => {
   const INSTAGRAM_URL = "https://www.instagram.com/callistadigital";
 
   useEffect(() => window.scrollTo(0, 0), [view]);
+
+  const faqs = [
+    {
+      q: "Why are Callista Digital websites harder to hack than WordPress?",
+      a: "Callista Digital sites are built as modern static web apps, not traditional WordPress installs. \n\nThat means: \n• No exposed admin login pages \n• No vulnerable plugin ecosystem \n• No PHP execution layer \n• No public database endpoints \n• No writable server files \n\nMost WordPress hacks happen through outdated plugins or login brute-force attacks. Our architecture removes those attack paths entirely. Nothing online is 100% unhackable — but our stack dramatically reduces real-world risk."
+    },
+    {
+      q: "So you don’t use WordPress at all?",
+      a: "Correct. We use a modern React + Vercel architecture designed for speed, security, and reliability. \n\nWordPress was built for blogs in 2003. We build infrastructure designed for modern performance and mobile-first traffic. You get faster load times, cleaner code, and a stronger SEO foundation without plugin chaos."
+    },
+    {
+      q: "What makes Callista Digital different from a normal web designer?",
+      a: "Most designers build websites. We build infrastructure. \n\nA typical designer delivers a theme and a plugin stack. Callista Digital delivers hardened architecture, global hosting, and performance-optimized systems designed to last. You’re not buying decoration. You’re buying engineered reliability."
+    },
+    {
+      q: "Will my site go down if traffic spikes?",
+      a: "Highly unlikely. Sites are deployed on Vercel’s global edge network — the same class of infrastructure used by major SaaS platforms. \n\nTraffic doesn’t crash a server. It distributes automatically. That means better uptime, faster response, and resilience under load."
+    },
+    {
+      q: "Can I make edits to my website?",
+      a: "Edits are requested through Callista Digital and handled by our team. We design sites using a scientific performance framework — layout, spacing, typography, and flow are engineered to guide behavior and maximize conversion. \n\nUncontrolled edits can unknowingly throw off results. Instead of handing you a fragile editor, we protect the integrity of the system and implement changes correctly. You request changes. We execute them safely."
+    },
+    {
+      q: "Will my site be fast on mobile?",
+      a: "Yes. Our sites are precompiled, optimized, and delivered through a global CDN. \n\nThere’s no plugin bloat slowing performance. Speed is engineered into the architecture."
+    },
+    {
+      q: "Is this overkill for a small business?",
+      a: "No. Small businesses are the ones most harmed by downtime and hacks. \n\nSecurity and speed aren’t luxury upgrades — they’re baseline protection. A slow or compromised site costs far more than prevention."
+    },
+    {
+      q: "Is this future-proof?",
+      a: "Yes. We build on actively developed, industry-standard technology used by modern web platforms. \n\nThis isn’t experimental. It’s where the web has already moved."
+    }
+  ];
 
   const Header = () => (
     <nav className="fixed top-0 left-0 w-full z-50 px-4 py-4">
@@ -315,6 +383,17 @@ const App = () => {
         </ScrollReveal>
       </section>
 
+      {/* NEW GET STARTED SECTION (Under Infrastructure) */}
+      <section className="px-6 py-24 bg-slate-950 text-center border-b border-white/5">
+        <ScrollReveal>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-black mb-8 uppercase tracking-tighter leading-[0.9]">Ready to upgrade your <br className="hidden md:block" /> <span className="text-amber-500">infrastructure?</span></h2>
+            <p className="text-lg text-slate-400 font-light mb-12 max-w-xl mx-auto">Experience the speed, security, and prestige of a global edge network built for the modern web.</p>
+            <GlowingButton onClick={() => setView('pricing')}>Get Our Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
+          </div>
+        </ScrollReveal>
+      </section>
+
       {/* The Studio Section */}
       <section className="px-6 py-32 max-w-6xl mx-auto">
         <ScrollReveal>
@@ -358,7 +437,7 @@ const App = () => {
       </section>
 
       {/* Social Proof Testimonials */}
-      <section className="px-6 py-24 md:py-32 bg-slate-950">
+      <section className="px-6 py-24 md:py-32 bg-slate-950 border-t border-white/5">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-16">
@@ -366,7 +445,6 @@ const App = () => {
               <h3 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-8 leading-none">REAL WORLD <span className="text-amber-500">RESULTS.</span></h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-              {/* Marcella V. - Vesper Catering Co. */}
               <div className="bg-slate-900 p-8 md:p-12 rounded-[40px] border border-white/5 relative group hover:border-amber-500/30 transition-all duration-500 shadow-xl">
                 <Quote className="w-10 h-10 text-amber-500/20 absolute top-8 right-8 group-hover:text-amber-500/40 transition-colors" />
                 <div className="mb-8">
@@ -380,8 +458,6 @@ const App = () => {
                   </div>
                 </div>
               </div>
-              
-              {/* Elias K. - Nomad Horizon Club */}
               <div className="bg-slate-900 p-8 md:p-12 rounded-[40px] border border-white/5 relative group hover:border-amber-500/30 transition-all duration-500 shadow-xl">
                 <Quote className="w-10 h-10 text-amber-500/20 absolute top-8 right-8 group-hover:text-amber-500/40 transition-colors" />
                 <div className="mb-8">
@@ -395,6 +471,33 @@ const App = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="px-6 py-24 md:py-32 bg-slate-900 relative">
+        <div className="max-w-4xl mx-auto">
+          <ScrollReveal>
+            <div className="text-center mb-20">
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">FAQ</h2>
+              <h3 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-8 leading-none">Why Callista Digital <br/> Is Built Differently</h3>
+              <p className="text-slate-400 text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto">
+                Modern websites shouldn’t be fragile, slow, or easy to break. <br className="hidden md:block"/> We build infrastructure — not templates.
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              {faqs.map((faq, index) => (
+                <FAQItem 
+                  key={index}
+                  question={faq.q}
+                  answer={faq.a}
+                  isOpen={openFaq === index}
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                />
+              ))}
             </div>
           </ScrollReveal>
         </div>
