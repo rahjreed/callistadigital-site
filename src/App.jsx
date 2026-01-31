@@ -41,6 +41,8 @@ import {
 const apiKey = "";
 const TEXT_LOGO = "https://images.travelprox.com/callista/textlogo.png";
 const FAVICON = "https://images.travelprox.com/callista/favicon.png";
+const CONTACT_EMAIL = "hello@callistadigital.com";
+const INSTAGRAM_URL = "https://www.instagram.com/callistadigital";
 
 // --- FAQ Component ---
 const FAQItem = ({ question, answer, isOpen, onClick }) => {
@@ -90,7 +92,7 @@ const ChatBot = ({ messages, setMessages }) => {
     
     let contactInstruction = "";
     if (userMsgCount === 2 || (userMsgCount > 2 && (userMsgCount - 2) % 3 === 0)) {
-       contactInstruction = "\n\nREQUIRED ACTION: You must now end this specific message by telling the user the best way to get started is to email hello@callistadigital.com or DM @callistadigital on Instagram.";
+       contactInstruction = `\n\nREQUIRED ACTION: You must now end this specific message by telling the user the best way to get started is to email ${CONTACT_EMAIL} or DM @callistadigital on Instagram.`;
     }
 
     const systemPrompt = `You are a professional Digital Strategist for Callista Digital. 
@@ -124,7 +126,7 @@ const ChatBot = ({ messages, setMessages }) => {
       return data.text || "System unavailable.";
     } catch (error) {
       if (retryCount < 3) return callGemini(userQuery, retryCount + 1);
-      return "We are experiencing a brief network interruption. Please reach out to us directly at hello@callistadigital.com!";
+      return `We are experiencing a brief network interruption. Please reach out to us directly at ${CONTACT_EMAIL}!`;
     }
   };
 
@@ -211,7 +213,12 @@ const GlowingButton = ({ onClick, children, className = "", isLink = false, href
     </>
   );
   const classes = `group relative p-[1.5px] inline-block overflow-hidden rounded-full transition-all duration-300 hover:scale-[1.03] active:scale-95 ${currentTheme.shadow} ${className}`;
-  return isLink ? <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>{content}</a> : <button onClick={onClick} className={classes}>{content}</button>;
+  
+  if (isLink) {
+    return <a href={href} target={href.startsWith('mailto') ? '_self' : '_blank'} rel="noopener noreferrer" className={classes}>{content}</a>;
+  }
+  
+  return <button onClick={onClick} className={classes}>{content}</button>;
 };
 
 // --- Main App ---
@@ -224,7 +231,6 @@ const App = () => {
   
   const HERO_IMAGE = "https://images.travelprox.com/callista/cdhero.png";
   const WOMAN_IMAGE = "https://images.travelprox.com/callista/woman.png";
-  const INSTAGRAM_URL = "https://www.instagram.com/callistadigital";
 
   useEffect(() => window.scrollTo(0, 0), [view]);
 
@@ -337,7 +343,7 @@ const App = () => {
         <ScrollReveal>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-20 md:mb-24">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">The Infrastructure</h2>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">The Infrastructure</h2>
               <h3 className="text-4xl md:text-7xl font-black tracking-tighter uppercase mb-8 leading-none">BUILT DIFFERENT.</h3>
               <p className="text-slate-400 text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed italic px-4">Most websites sit on one cheap server. Ours run on the same global edge network used by modern apps — fast, secure, maintenance-free.</p>
             </div>
@@ -379,17 +385,6 @@ const App = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* NEW GET STARTED SECTION (Under Infrastructure) */}
-      <section className="px-6 py-24 bg-slate-950 text-center border-b border-white/5">
-        <ScrollReveal>
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-black mb-8 uppercase tracking-tighter leading-[0.9]">Ready to upgrade your <br className="hidden md:block" /> <span className="text-amber-500">infrastructure?</span></h2>
-            <p className="text-lg text-slate-400 font-light mb-12 max-w-xl mx-auto">Experience the speed, security, and prestige of a global edge network built for the modern web.</p>
-            <GlowingButton onClick={() => setView('pricing')}>Get Our Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
           </div>
         </ScrollReveal>
       </section>
@@ -514,6 +509,7 @@ const App = () => {
 
       <footer className="px-6 py-20 bg-black border-t border-white/5 text-center font-sans px-4">
         <div className="max-w-xl mx-auto">
+          {/* CORRECTED INSTAGRAM LINK */}
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-block group mb-10">
             <Instagram className="w-10 h-10 text-slate-500 group-hover:text-amber-500 transition-all transform group-hover:scale-110" />
           </a>
@@ -555,7 +551,7 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" className="w-full py-5 text-sm" onClick={() => window.open(INSTAGRAM_URL, '_blank')}>Secure Our Build</GlowingButton>
+                <GlowingButton variant="none" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 text-sm uppercase font-black tracking-widest">Secure Our Build</GlowingButton>
               </div>
 
               <div className="bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/5 flex flex-col shadow-lg">
@@ -569,7 +565,7 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3 text-xs md:text-sm"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Select Premium</GlowingButton>
+                <GlowingButton variant="none" theme="silver" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 text-sm uppercase font-black tracking-widest">Select Premium</GlowingButton>
               </div>
 
               <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/10 flex flex-col shadow-lg overflow-visible">
@@ -593,7 +589,7 @@ const App = () => {
                     <div className="flex items-center space-x-3 text-slate-500"><Search className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase text-amber-500/80 tracking-widest font-black">Optimized for AI Search</span></div>
                   </div>
                 </div>
-                <GlowingButton variant="none" theme="silver" className="w-full py-5 text-sm" onClick={() => document.getElementById('support-plan')?.scrollIntoView({ behavior: 'smooth' })}>Select Enterprise</GlowingButton>
+                <GlowingButton variant="none" theme="silver" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 text-sm uppercase font-black tracking-widest">Select Enterprise</GlowingButton>
               </div>
             </div>
           </ScrollReveal>
@@ -603,7 +599,7 @@ const App = () => {
         <section className="mb-40" id="support-plan">
           <ScrollReveal>
             <div className="text-center mb-16 max-w-md mx-auto px-4">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">Ongoing Support</h2>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">Ongoing Support</h2>
               <div className="relative p-10 rounded-[48px] bg-slate-900 border-2 border-amber-500/20 shadow-3xl text-center hover:border-amber-500/40 transition-all group">
                 <div className="flex flex-col items-center mb-10">
                   <div className="flex items-baseline font-sans font-black"><span className="text-2xl font-black text-slate-500 mr-1">$</span><span className="text-7xl font-black text-white tracking-tighter">125</span><span className="text-slate-500 text-xs font-black ml-2 uppercase tracking-widest font-black">/ month</span></div>
@@ -614,7 +610,7 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" className="w-full py-5 text-sm uppercase font-black tracking-widest" onClick={() => window.open(INSTAGRAM_URL, '_blank')}>Start Support Plan</GlowingButton>
+                <GlowingButton variant="none" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 text-sm uppercase font-black tracking-widest">Start Support Plan</GlowingButton>
               </div>
             </div>
           </ScrollReveal>
@@ -624,7 +620,7 @@ const App = () => {
         <section className="mb-40">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">Growth Engines</h2>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">Growth Engines</h2>
               <h3 className="text-4xl md:text-5xl font-black mb-6 uppercase tracking-tight">BLOG CONTENT BUNDLES.</h3>
               <p className="text-slate-400 text-lg font-light max-w-2xl mx-auto italic px-4">Professional, high-precision content designed to rank on Google and AI search engines.</p>
             </div>
@@ -645,7 +641,7 @@ const App = () => {
                     <span className="text-slate-500 text-xs ml-2 uppercase tracking-widest font-black">/ month</span>
                   </div>
                   <p className="text-sm text-slate-400 font-medium italic mb-10">{b.desc}</p>
-                  <GlowingButton variant="none" small theme="silver" className="w-full py-4 uppercase tracking-widest font-black" onClick={() => window.open(INSTAGRAM_URL, '_blank')}>Inquire</GlowingButton>
+                  <GlowingButton variant="none" small theme="silver" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-4 uppercase tracking-widest font-black">Inquire</GlowingButton>
                 </div>
               ))}
             </div>
@@ -657,15 +653,21 @@ const App = () => {
           <ScrollReveal>
             <div className="bg-amber-500/5 border border-amber-500/20 p-10 md:p-20 rounded-[60px] text-center relative overflow-hidden group shadow-2xl mx-4 md:mx-0 flex flex-col items-center">
               <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none duration-1000"><Globe className="w-64 h-64 text-amber-500" /></div>
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black tracking-widest">CUSTOM SOLUTIONS</h2>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black tracking-widest uppercase">CUSTOM SOLUTIONS</h2>
               <h3 className="text-4xl md:text-8xl font-black mb-10 tracking-tighter uppercase leading-[0.9] text-white max-w-4xl text-center">CUSTOM <br className="md:hidden" /> ARCHITECTURE.</h3>
               <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12 px-4 italic">For businesses that need personal hosting, high-volume architecture, or fully custom designs. Projects offered selectively to ensure elite quality.</p>
-              <div className="flex flex-col items-center"><a href="mailto:hello@callistadigital.com" className="group flex items-center text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 border border-white/10 px-10 py-5 rounded-full hover:bg-black transition-all shadow-3xl hover:border-amber-500/30 font-black"><Mail className="w-4 h-4 mr-3 text-amber-500 group-hover:scale-110 transition-transform" />Email to request information</a></div>
+              <div className="flex flex-col items-center">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="group flex items-center text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 border border-white/10 px-10 py-5 rounded-full hover:bg-black transition-all shadow-3xl hover:border-amber-500/30 font-black">
+                  <Mail className="w-4 h-4 mr-3 text-amber-500 group-hover:scale-110 transition-transform" />
+                  Email to request information
+                </a>
+              </div>
             </div>
           </ScrollReveal>
         </section>
 
         <footer className="pt-20 pb-10 flex flex-col md:flex-row justify-between items-center text-[9px] tracking-[0.3em] text-slate-700 font-black border-t border-white/5 space-y-4 uppercase font-black px-4">
+           {/* CORRECTED INSTAGRAM LINK IN PRICING FOOTER */}
            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="group">
             <Instagram className="w-6 h-6 text-slate-700 group-hover:text-amber-500 transition-colors" />
            </a>
