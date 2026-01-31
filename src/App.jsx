@@ -13,7 +13,7 @@ import {
   Globe,
   Loader2,
   Camera,
-  Star,
+  Star, 
   ShieldCheck,
   ZapOff,
   ShoppingBag,
@@ -72,6 +72,8 @@ const ChatBot = ({ messages, setMessages }) => {
     
     CRITICAL FORMATTING RULES:
     - Communicate in PLAIN TEXT ONLY.
+    - RESPOND WITH 1 TO 2 SENTENCES MAX.
+    - AFTER YOUR RESPONSE, ALWAYS ASK A DISCOVERY QUESTION to learn about the user's business or digital goals.
     - NEVER use hashtags (#), bolding symbols (**), or tables.
     - Do not use markdown. Use simple line breaks for space between paragraphs.
     - Be elite, professional, and minimalist in your tone. Use "We" instead of "I".
@@ -402,7 +404,7 @@ const App = () => {
       <section className="px-6 py-24 md:py-32 bg-slate-950 text-center font-sans">
         <ScrollReveal>
           <h2 className="text-4xl md:text-6xl font-black mb-12 uppercase tracking-tighter leading-[0.9]">READY TO <br/> <span className="text-amber-500 uppercase">GET STARTED?</span></h2>
-          <GlowingButton onClick={() => setView('pricing')}>Get Your Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
+          <GlowingButton onClick={() => setView('pricing')}>Get Our Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
           <p className="mt-10 text-sm text-slate-500 italic font-light tracking-wide">Founder's pricing is available for a limited time.</p>
         </ScrollReveal>
       </section>
