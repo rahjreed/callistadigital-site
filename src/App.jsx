@@ -35,8 +35,7 @@ import {
   PenTool
 } from 'lucide-react';
 
-// API Key removed for security. 
-// Paste your Google AI Studio API Key here to enable the Strategist bot on your live site.
+// API Key variable preserved for general configuration if needed elsewhere
 const apiKey = "";
 
 // --- ChatBot Component ---
@@ -77,23 +76,17 @@ const ChatBot = ({ messages, setMessages }) => {
     ${contactInstruction}`;
 
     try {
-      if (!apiKey) {
-        return "The Strategist bot is currently in offline mode. Please contact hello@callistadigital.com for assistance.";
-      }
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: userQuery }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] }
-        })
+      // Replaced previous direct fetch with internal API routing
+      const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userQuery, systemPrompt }),
       });
-      
+
       const data = await response.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "We are having trouble connecting right now. Please email hello@callistadigital.com!";
-      
-      return rawText.replace(/[#*_|]/g, '');
+      if (!response.ok) throw new Error("Chat failed");
+
+      return data.text || "System unavailable.";
     } catch (error) {
       if (retryCount < 3) return callGemini(userQuery, retryCount + 1);
       return "We are experiencing a brief network interruption. Please reach out to us directly at hello@callistadigital.com!";
@@ -342,7 +335,7 @@ const App = () => {
       <section className="px-6 py-24 md:py-32 bg-slate-950 text-center font-sans">
         <ScrollReveal>
           <h2 className="text-4xl md:text-6xl font-black mb-12 uppercase tracking-tighter leading-[0.9]">READY TO <br/> <span className="text-amber-500 uppercase">GET STARTED?</span></h2>
-          <GlowingButton onClick={() => setView('pricing')}>Get Our Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
+          <GlowingButton onClick={() => setView('pricing')}>Get Your Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
           <p className="mt-10 text-sm text-slate-500 italic font-light tracking-wide">Founder's pricing is available for a limited time.</p>
         </ScrollReveal>
       </section>
@@ -479,25 +472,12 @@ const App = () => {
                   <div className="flex items-baseline mb-8 font-black">
                     <span className="text-xl text-slate-500 mr-1">$</span>
                     <span className="text-6xl text-white tracking-tighter">{b.price}</span>
-                    <span className="text-slate-500 text-xs ml-2 uppercase tracking-widest">/ month</span>
+                    <span className="text-slate-500 text-xs ml-2 uppercase tracking-widest font-black">/ month</span>
                   </div>
                   <p className="text-sm text-slate-400 font-medium italic mb-10">{b.desc}</p>
                   <GlowingButton variant="none" small theme="silver" className="w-full py-4 uppercase tracking-widest font-black" onClick={() => window.open(INSTAGRAM_URL, '_blank')}>Inquire</GlowingButton>
                 </div>
               ))}
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Custom Architecture */}
-        <section className="mb-40">
-          <ScrollReveal>
-            <div className="bg-amber-500/5 border border-amber-500/20 p-10 md:p-20 rounded-[60px] text-center relative overflow-hidden group shadow-2xl mx-4 md:mx-0 flex flex-col items-center">
-              <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none duration-1000"><Globe className="w-64 h-64 text-amber-500" /></div>
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black tracking-widest">CUSTOM SOLUTIONS</h2>
-              <h3 className="text-4xl md:text-8xl font-black mb-8 tracking-tighter uppercase leading-[0.9] text-white max-w-4xl text-center">CUSTOM <br className="md:hidden" /> ARCHITECTURE.</h3>
-              <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12 px-4 italic">For businesses that need personal hosting, high-volume architecture, or fully custom designs. Projects offered selectively to ensure elite quality.</p>
-              <div className="flex flex-col items-center"><a href="mailto:hello@callistadigital.com" className="group flex items-center text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 border border-white/10 px-10 py-5 rounded-full hover:bg-black transition-all shadow-3xl hover:border-amber-500/30 font-black"><Mail className="w-4 h-4 mr-3 text-amber-500 group-hover:scale-110 transition-transform" />Email to request information</a></div>
             </div>
           </ScrollReveal>
         </section>
