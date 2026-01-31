@@ -14,7 +14,7 @@ import {
   Loader2,
   Camera,
   Star, 
-  ShieldCheck,
+  ShieldCheck, 
   ZapOff,
   ShoppingBag,
   Timer,
@@ -35,7 +35,8 @@ import {
   PenTool,
   Quote,
   Plus,
-  Minus
+  Minus,
+  Check
 } from 'lucide-react';
 
 const apiKey = "";
@@ -43,6 +44,163 @@ const TEXT_LOGO = "https://images.travelprox.com/callista/textlogo.png";
 const FAVICON = "https://images.travelprox.com/callista/favicon.png";
 const CONTACT_EMAIL = "hello@callistadigital.com";
 const INSTAGRAM_URL = "https://www.instagram.com/callistadigital";
+
+// --- Inquiry Modal Component (Integrated with Kit) ---
+const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
+  const [status, setStatus] = useState('idle'); // 'idle', 'submitting', 'success'
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    comments: ''
+  });
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('submitting');
+
+    // Prepare data for Kit (ConvertKit)
+    // We combine names and package info into the comments to ensure no data is lost
+    // as custom field IDs can vary per account.
+    const kitData = new FormData();
+    kitData.append('fields[first_name]', formData.firstName);
+    kitData.append('email_address', formData.email);
+    kitData.append('fields[last_name]', formData.lastName);
+    kitData.append('fields[phone_number]', formData.phone);
+    kitData.append('fields[package_selected]', selectedPackage);
+    kitData.append('fields[comments]', `Package: ${selectedPackage}\nPhone: ${formData.phone}\nMessage: ${formData.comments}`);
+
+    try {
+      await fetch("https://app.kit.com/forms/9036743/subscriptions", {
+        method: "POST",
+        body: kitData,
+        mode: 'no-cors' // Standard for cross-origin form posts to Kit
+      });
+      setStatus('success');
+    } catch (error) {
+      console.error("Submission error", error);
+      setStatus('idle');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center px-4 overflow-y-auto py-10">
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
+      
+      <div className="relative w-full max-w-xl bg-slate-900 border border-white/10 rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <button onClick={onClose} className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors z-10">
+          <X className="w-6 h-6" />
+        </button>
+
+        {status !== 'success' ? (
+          <div className="p-8 md:p-12">
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-4">Project Inquiry</h2>
+            <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight mb-8">
+              {selectedPackage || "Start Your Build"}
+            </h3>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">First Name</label>
+                  <input 
+                    required
+                    type="text" 
+                    className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
+                    placeholder="John"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Last Name</label>
+                  <input 
+                    required
+                    type="text" 
+                    className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
+                    placeholder="Doe"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Email Address</label>
+                <input 
+                  required
+                  type="email" 
+                  className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
+                  placeholder="john@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Phone Number</label>
+                <input 
+                  required
+                  type="tel" 
+                  className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
+                  placeholder="+1 (555) 000-0000"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Comments / Goals</label>
+                <textarea 
+                  className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800 min-h-[100px] resize-none"
+                  placeholder="Tell us about your brand or specific project needs..."
+                  value={formData.comments}
+                  onChange={(e) => setFormData({...formData, comments: e.target.value})}
+                />
+              </div>
+
+              <button 
+                type="submit"
+                disabled={status === 'submitting'}
+                className="w-full bg-amber-500 text-slate-950 font-black uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-white hover:scale-[1.02] transition-all shadow-xl shadow-amber-500/10 flex items-center justify-center space-x-3"
+              >
+                {status === 'submitting' ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <span>Send Request</span>
+                )}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="p-12 text-center space-y-8 animate-in fade-in slide-in-from-bottom-4">
+            <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto border border-amber-500/20">
+              <Check className="w-10 h-10 text-amber-500" />
+            </div>
+            <div>
+              <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Request Received</h3>
+              <p className="text-slate-400 font-light leading-relaxed">
+                Thank you, {formData.firstName}. We have received your inquiry. A strategist will reach out to you within 24 hours.
+              </p>
+            </div>
+            <button 
+              onClick={onClose}
+              className="px-10 py-4 border border-white/10 rounded-full text-xs font-black uppercase tracking-widest hover:bg-white hover:text-slate-950 transition-all"
+            >
+              Close Window
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 // --- FAQ Component ---
 const FAQItem = ({ question, answer, isOpen, onClick }) => {
@@ -225,6 +383,8 @@ const GlowingButton = ({ onClick, children, className = "", isLink = false, href
 const App = () => {
   const [view, setView] = useState('home');
   const [openFaq, setOpenFaq] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState("");
   const [chatMessages, setChatMessages] = useState([
     { role: 'assistant', text: "Hi, we are your Callista Digital strategists. How can we help you level up your online presence today?" }
   ]);
@@ -233,6 +393,11 @@ const App = () => {
   const WOMAN_IMAGE = "https://images.travelprox.com/callista/woman.png";
 
   useEffect(() => window.scrollTo(0, 0), [view]);
+
+  const openInquiry = (pkg) => {
+    setSelectedPackage(pkg);
+    setModalOpen(true);
+  };
 
   const faqs = [
     {
@@ -389,6 +554,17 @@ const App = () => {
         </ScrollReveal>
       </section>
 
+      {/* Upgrade CTA */}
+      <section className="px-6 py-24 bg-slate-950 text-center border-y border-white/5">
+        <ScrollReveal>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-black mb-8 uppercase tracking-tighter leading-[0.9]">Ready to upgrade your <br className="hidden md:block" /> <span className="text-amber-500">infrastructure?</span></h2>
+            <p className="text-lg text-slate-400 font-light mb-12 max-w-xl mx-auto italic">Experience the speed, security, and prestige of a global edge network built for the modern web.</p>
+            <GlowingButton onClick={() => setView('pricing')}>Get Started <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" /></GlowingButton>
+          </div>
+        </ScrollReveal>
+      </section>
+
       {/* The Studio Section */}
       <section className="px-6 py-32 max-w-6xl mx-auto">
         <ScrollReveal>
@@ -436,7 +612,7 @@ const App = () => {
         <div className="max-w-6xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest">Client Success</h2>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">Client Success</h2>
               <h3 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-8 leading-none">REAL WORLD <span className="text-amber-500">RESULTS.</span></h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
@@ -509,7 +685,6 @@ const App = () => {
 
       <footer className="px-6 py-20 bg-black border-t border-white/5 text-center font-sans px-4">
         <div className="max-w-xl mx-auto">
-          {/* CORRECTED INSTAGRAM LINK */}
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-block group mb-10">
             <Instagram className="w-10 h-10 text-slate-500 group-hover:text-amber-500 transition-all transform group-hover:scale-110" />
           </a>
@@ -551,7 +726,7 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 text-sm uppercase font-black tracking-widest">Secure Our Build</GlowingButton>
+                <GlowingButton variant="none" onClick={() => openInquiry("Reserve Founder Build")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Reserve Founder Build</GlowingButton>
               </div>
 
               <div className="bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/5 flex flex-col shadow-lg">
@@ -565,7 +740,7 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3 text-xs md:text-sm"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" theme="silver" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 text-sm uppercase font-black tracking-widest">Select Premium</GlowingButton>
+                <GlowingButton variant="none" theme="silver" onClick={() => openInquiry("Start Premium Project")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Start Premium Project</GlowingButton>
               </div>
 
               <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/10 flex flex-col shadow-lg overflow-visible">
@@ -589,7 +764,7 @@ const App = () => {
                     <div className="flex items-center space-x-3 text-slate-500"><Search className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase text-amber-500/80 tracking-widest font-black">Optimized for AI Search</span></div>
                   </div>
                 </div>
-                <GlowingButton variant="none" theme="silver" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 text-sm uppercase font-black tracking-widest">Select Enterprise</GlowingButton>
+                <GlowingButton variant="none" theme="silver" onClick={() => openInquiry("Begin Full Architecture")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Begin Full Architecture</GlowingButton>
               </div>
             </div>
           </ScrollReveal>
@@ -610,7 +785,7 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-5 text-sm uppercase font-black tracking-widest">Start Support Plan</GlowingButton>
+                <GlowingButton variant="none" onClick={() => openInquiry("Start Support Plan")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Start Support Plan</GlowingButton>
               </div>
             </div>
           </ScrollReveal>
@@ -641,7 +816,7 @@ const App = () => {
                     <span className="text-slate-500 text-xs ml-2 uppercase tracking-widest font-black">/ month</span>
                   </div>
                   <p className="text-sm text-slate-400 font-medium italic mb-10">{b.desc}</p>
-                  <GlowingButton variant="none" small theme="silver" isLink href={`mailto:${CONTACT_EMAIL}`} className="w-full py-4 uppercase tracking-widest font-black">Inquire</GlowingButton>
+                  <GlowingButton variant="none" small theme="silver" onClick={() => openInquiry(`Start ${b.name}`)} className="w-full py-4 uppercase tracking-widest font-black">Start Bundle</GlowingButton>
                 </div>
               ))}
             </div>
@@ -657,17 +832,44 @@ const App = () => {
               <h3 className="text-4xl md:text-8xl font-black mb-10 tracking-tighter uppercase leading-[0.9] text-white max-w-4xl text-center">CUSTOM <br className="md:hidden" /> ARCHITECTURE.</h3>
               <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12 px-4 italic">For businesses that need personal hosting, high-volume architecture, or fully custom designs. Projects offered selectively to ensure elite quality.</p>
               <div className="flex flex-col items-center">
-                <a href={`mailto:${CONTACT_EMAIL}`} className="group flex items-center text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 border border-white/10 px-10 py-5 rounded-full hover:bg-black transition-all shadow-3xl hover:border-amber-500/30 font-black">
+                <button 
+                  onClick={() => openInquiry("Request Custom Architecture")}
+                  className="group flex items-center text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 border border-white/10 px-10 py-5 rounded-full hover:bg-black transition-all shadow-3xl hover:border-amber-500/30 font-black"
+                >
                   <Mail className="w-4 h-4 mr-3 text-amber-500 group-hover:scale-110 transition-transform" />
-                  Email to request information
-                </a>
+                  Request Custom Architecture
+                </button>
               </div>
             </div>
           </ScrollReveal>
         </section>
 
+        {/* TRUST STRIP SECTION */}
+        <section className="py-24 border-y border-white/5 bg-slate-900/50">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <ScrollReveal>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500 mb-8">Process Over Promises</h2>
+              <h3 className="text-3xl md:text-5xl font-black mb-12 uppercase tracking-tighter leading-tight text-white max-w-4xl mx-auto">Built With Structure. <br className="hidden md:block" /> Delivered With Precision.</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 border-t border-white/5 pt-12">
+                {[
+                  "Structured onboarding.",
+                  "Strategy-first build process.",
+                  "Revision framework included.",
+                  "Managed launch support."
+                ].map((item, i) => (
+                  <div key={i} className="flex flex-col items-center md:items-start text-center md:text-left space-y-2">
+                    <CheckCircle2 className="w-4 h-4 text-amber-500 mb-2" />
+                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 leading-relaxed">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
         <footer className="pt-20 pb-10 flex flex-col md:flex-row justify-between items-center text-[9px] tracking-[0.3em] text-slate-700 font-black border-t border-white/5 space-y-4 uppercase font-black px-4">
-           {/* CORRECTED INSTAGRAM LINK IN PRICING FOOTER */}
            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="group">
             <Instagram className="w-6 h-6 text-slate-700 group-hover:text-amber-500 transition-colors" />
            </a>
@@ -681,6 +883,11 @@ const App = () => {
   return (
     <div className="font-sans antialiased bg-slate-950 w-full overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
       <ChatBot messages={chatMessages} setMessages={setChatMessages} />
+      <InquiryModal 
+        isOpen={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+        selectedPackage={selectedPackage} 
+      />
       {view === 'home' ? <PageOne /> : <PageTwo />}
     </div>
   );
