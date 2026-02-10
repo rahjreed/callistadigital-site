@@ -62,9 +62,6 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
     e.preventDefault();
     setStatus('submitting');
 
-    // Prepare data for Kit (ConvertKit)
-    // We combine names and package info into the comments to ensure no data is lost
-    // as custom field IDs can vary per account.
     const kitData = new FormData();
     kitData.append('fields[first_name]', formData.firstName);
     kitData.append('email_address', formData.email);
@@ -77,7 +74,7 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
       await fetch("https://app.kit.com/forms/9036743/subscriptions", {
         method: "POST",
         body: kitData,
-        mode: 'no-cors' // Standard for cross-origin form posts to Kit
+        mode: 'no-cors'
       });
       setStatus('success');
     } catch (error) {
@@ -97,9 +94,9 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
 
         {status !== 'success' ? (
           <div className="p-8 md:p-12">
-            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-4">Project Inquiry</h2>
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-4">Inquiry</h2>
             <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight mb-8">
-              {selectedPackage || "Start Your Build"}
+              {selectedPackage || "Work With Us"}
             </h3>
             
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -110,7 +107,7 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
                     required
                     type="text" 
                     className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                    placeholder="John"
+                    placeholder="First Name"
                     value={formData.firstName}
                     onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                   />
@@ -121,7 +118,7 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
                     required
                     type="text" 
                     className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                    placeholder="Doe"
+                    placeholder="Last Name"
                     value={formData.lastName}
                     onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                   />
@@ -134,7 +131,7 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
                   required
                   type="email" 
                   className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                  placeholder="john@example.com"
+                  placeholder="Email Address"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
@@ -146,17 +143,17 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
                   required
                   type="tel" 
                   className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="Phone Number"
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Comments / Goals</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Comments / Business Goals</label>
                 <textarea 
                   className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800 min-h-[100px] resize-none"
-                  placeholder="Tell us about your brand or specific project needs..."
+                  placeholder="Tell us about your brand..."
                   value={formData.comments}
                   onChange={(e) => setFormData({...formData, comments: e.target.value})}
                 />
@@ -186,14 +183,14 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
             <div>
               <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Request Received</h3>
               <p className="text-slate-400 font-light leading-relaxed">
-                Thank you, {formData.firstName}. We have received your inquiry. A strategist will reach out to you within 24 hours.
+                Thank you, {formData.firstName}. Your inquiry for {selectedPackage} has been logged. A strategist will contact you shortly.
               </p>
             </div>
             <button 
               onClick={onClose}
               className="px-10 py-4 border border-white/10 rounded-full text-xs font-black uppercase tracking-widest hover:bg-white hover:text-slate-950 transition-all"
             >
-              Close Window
+              Close
             </button>
           </div>
         )}
@@ -250,24 +247,20 @@ const ChatBot = ({ messages, setMessages }) => {
     
     let contactInstruction = "";
     if (userMsgCount === 2 || (userMsgCount > 2 && (userMsgCount - 2) % 3 === 0)) {
-       contactInstruction = `\n\nREQUIRED ACTION: You must now end this specific message by telling the user the best way to get started is to email ${CONTACT_EMAIL} or DM @callistadigital on Instagram.`;
+       contactInstruction = `\n\nREQUIRED ACTION: You must now end this specific message by telling the user the best way to get started is to use the "Request" buttons on the pricing page or email ${CONTACT_EMAIL}.`;
     }
 
     const systemPrompt = `You are a professional Digital Strategist for Callista Digital. 
-    Our pricing and structure:
-    - 2-Page Brand Build: $797 (Founder's Special). Focus: Clarity and conversion.
-    - 3-Page Custom Site: $1497. Focus: Custom interior content.
-    - 5-Page Complete Presence: $2397. Includes blog, premium management, and AEO optimization.
-    - Professional Management: $125/mo for hosting, updates, and 1 small edit/month.
-    - A la Carte Blog Posts: $125 per post.
-    - Blog Packages: 4 posts/mo ($500), 8 posts/mo ($900), 12 posts/mo ($1,200).
+    Our updated agency pricing model:
+    - Conversion Hub: $197 setup + $20/month. Instant product. Premium personal landing system built in 72 hours.
+    - Website Builds: Starting at $997. Strategic upgrade path. Custom high-converting websites.
+    
+    Professional Management: $125/mo for general maintenance and updates.
     
     CRITICAL FORMATTING RULES:
     - Communicate in PLAIN TEXT ONLY.
     - RESPOND WITH 1 TO 2 SENTENCES MAX.
-    - AFTER YOUR RESPONSE, ALWAYS ASK A DISCOVERY QUESTION to learn about the user's business or digital goals.
-    - NEVER use hashtags (#), bolding symbols (**), or tables.
-    - Do not use markdown. Use simple line breaks for space between paragraphs.
+    - AFTER YOUR RESPONSE, ALWAYS ASK A DISCOVERY QUESTION.
     - Be elite, professional, and minimalist in your tone. Use "We" instead of "I".
     ${contactInstruction}`;
 
@@ -284,7 +277,7 @@ const ChatBot = ({ messages, setMessages }) => {
       return data.text || "System unavailable.";
     } catch (error) {
       if (retryCount < 3) return callGemini(userQuery, retryCount + 1);
-      return `We are experiencing a brief network interruption. Please reach out to us directly at ${CONTACT_EMAIL}!`;
+      return `We are experiencing a connection delay. Please reach out to ${CONTACT_EMAIL}!`;
     }
   };
 
@@ -373,7 +366,7 @@ const GlowingButton = ({ onClick, children, className = "", isLink = false, href
   const classes = `group relative p-[1.5px] inline-block overflow-hidden rounded-full transition-all duration-300 hover:scale-[1.03] active:scale-95 ${currentTheme.shadow} ${className}`;
   
   if (isLink) {
-    return <a href={href} target={href.startsWith('mailto') ? '_self' : '_blank'} rel="noopener noreferrer" className={classes}>{content}</a>;
+    return <a href={href} className={classes}>{content}</a>;
   }
   
   return <button onClick={onClick} className={classes}>{content}</button>;
@@ -472,19 +465,19 @@ const App = () => {
             <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-2xl mx-auto font-light px-4 md:px-0 text-center">
               Where beautifully crafted design meets intelligent precision.
             </p>
-            <GlowingButton onClick={() => setView('pricing')} theme="gold">Get Your Page Built <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" /></GlowingButton>
+            <GlowingButton onClick={() => setView('pricing')} theme="gold">Get Started <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" /></GlowingButton>
           </ScrollReveal>
         </div>
       </section>
 
-      {/* The Authority Section */}
+      {/* Authority Section */}
       <section className="px-6 py-24 md:py-32 bg-slate-900 relative border-y border-white/5 shadow-inner">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
               <div className="relative">
                 <div className="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 blur-[60px] rounded-full" />
-                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white font-black">THE AUTHORITY</h2>
+                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white font-black uppercase">THE AUTHORITY</h2>
                 <p className="text-3xl md:text-6xl font-black leading-[1.1] mb-8 text-white uppercase tracking-tight">
                   We turn digital chaos <br className="hidden md:block" /> into <span className="text-slate-500">elegant command.</span>
                 </p>
@@ -503,18 +496,36 @@ const App = () => {
         </div>
       </section>
 
+      {/* Expertise Cards */}
+      <section className="px-6 py-24 md:py-32 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {[
+            { title: "Splash Page Design", desc: "Minimalist, high-conversion layouts designed for impact.", icon: <Layout /> },
+            { title: "Strategic Architecture", desc: "Intentional page flows that lead visitors to action.", icon: <ChevronRight /> },
+            { title: "Social Traffic Mastery", desc: "Optimized specifically for high-volume profile clicks.", icon: <Zap /> },
+            { title: "Global Hosting", desc: "Ultra-fast, maintenance-free edge infrastructure.", icon: <Globe /> }
+          ].map((s, i) => (
+            <ScrollReveal key={i}>
+              <div className="group p-8 md:p-10 h-full rounded-[40px] bg-slate-900 border border-white/5 hover:border-amber-500/50 transition-all duration-500 shadow-xl">
+                <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center mb-6 text-amber-500 group-hover:scale-110 transition-transform shadow-lg">{s.icon}</div>
+                <h3 className="text-xl md:text-2xl font-bold mb-4 uppercase tracking-tight">{s.title}</h3>
+                <p className="text-slate-400 font-light text-base md:text-lg">{s.desc}</p>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+      </section>
+
       {/* Infrastructure Comparison */}
       <section className="px-6 py-24 md:py-32 bg-slate-950">
         <ScrollReveal>
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20 md:mb-24">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">The Infrastructure</h2>
-              <h3 className="text-4xl md:text-7xl font-black tracking-tighter uppercase mb-8 leading-none">BUILT DIFFERENT.</h3>
-              <p className="text-slate-400 text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed italic px-4">Most websites sit on one cheap server. Ours run on the same global edge network used by modern apps — fast, secure, maintenance-free.</p>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-stretch relative">
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-1/2 h-full bg-amber-500/5 blur-[120px] rounded-full hidden lg:block pointer-events-none" />
-              <div className="bg-slate-900/50 p-8 md:p-12 rounded-t-[40px] lg:rounded-tr-none lg:rounded-l-[40px] border border-white/10 relative z-10 shadow-lg">
+          <div className="max-w-6xl mx-auto text-center">
+             <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">The Infrastructure</h2>
+             <h3 className="text-4xl md:text-7xl font-black tracking-tighter uppercase mb-8 leading-none">BUILT DIFFERENT.</h3>
+             <p className="text-slate-400 text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed italic px-4 mb-20">Most websites sit on one cheap server. Ours run on the same global edge network used by modern apps — fast, secure, maintenance-free.</p>
+          </div>
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-stretch relative">
+            <div className="bg-slate-900/50 p-8 md:p-12 rounded-t-[40px] lg:rounded-tr-none lg:rounded-l-[40px] border border-white/10 relative z-10 shadow-lg">
                 <h4 className="text-xl font-bold text-slate-200 mb-10 flex items-center uppercase tracking-tight"><Home className="w-6 h-6 mr-3 text-slate-500" /> Traditional Hosting</h4>
                 <div className="space-y-6">
                   {[
@@ -530,8 +541,8 @@ const App = () => {
                     </div>
                   ))}
                 </div>
-              </div>
-              <div className="relative bg-slate-900 p-8 md:p-12 rounded-b-[40px] lg:rounded-bl-none lg:rounded-r-[40px] border-2 border-amber-500/30 shadow-[0_0_100px_rgba(212,175,55,0.08)] z-20 overflow-hidden">
+            </div>
+            <div className="relative bg-slate-900 p-8 md:p-12 rounded-b-[40px] lg:rounded-bl-none lg:rounded-r-[40px] border-2 border-amber-500/30 shadow-[0_0_100px_rgba(212,175,55,0.08)] z-20 overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[100px] pointer-events-none" />
                 <h4 className="text-xl font-bold text-white mb-10 flex items-center relative z-10 uppercase tracking-tight"><Network className="w-6 h-6 mr-3 text-amber-500" /> Callista Digital</h4>
                 <div className="space-y-6 relative z-10">
@@ -548,7 +559,6 @@ const App = () => {
                     </div>
                   ))}
                 </div>
-              </div>
             </div>
           </div>
         </ScrollReveal>
@@ -570,7 +580,7 @@ const App = () => {
         <ScrollReveal>
           <div className="grid grid-cols-1 lg:grid-cols-2 bg-slate-900 rounded-[60px] border border-white/5 overflow-hidden shadow-2xl">
             <div className="p-10 md:p-24 flex flex-col justify-center order-2 lg:order-1 font-sans">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 tracking-widest">THE STUDIO</h2>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 tracking-widest uppercase">THE STUDIO</h2>
               <p className="text-3xl md:text-4xl font-bold leading-tight mb-8 text-white">
                 We craft digital front doors that <span className="italic underline decoration-amber-500 decoration-4 text-white">command attention.</span>
               </p>
@@ -592,7 +602,7 @@ const App = () => {
         </ScrollReveal>
       </section>
 
-      {/* Social Proof Stats */}
+      {/* Social Proof stats */}
       <section className="px-6 py-24 bg-white text-slate-950 text-center shadow-2xl">
         <ScrollReveal>
           <div className="flex justify-center space-x-2 mb-10">
@@ -653,12 +663,8 @@ const App = () => {
           <ScrollReveal>
             <div className="text-center mb-20">
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">FAQ</h2>
-              <h3 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-8 leading-none">Why Callista Digital <br/> Is Built Differently</h3>
-              <p className="text-slate-400 text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto">
-                Modern websites shouldn’t be fragile, slow, or easy to break. <br className="hidden md:block"/> We build infrastructure — not templates.
-              </p>
+              <h3 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-8 leading-none">Built Differently.</h3>
             </div>
-            
             <div className="space-y-2">
               {faqs.map((faq, index) => (
                 <FAQItem 
@@ -674,15 +680,7 @@ const App = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="px-6 py-24 md:py-32 bg-slate-950 text-center font-sans">
-        <ScrollReveal>
-          <h2 className="text-4xl md:text-6xl font-black mb-12 uppercase tracking-tighter leading-[0.9]">READY TO <br/> <span className="text-amber-500 uppercase">GET STARTED?</span></h2>
-          <GlowingButton onClick={() => setView('pricing')}>Get Our Page Built <ArrowRight className="ml-2 w-5 h-5" /></GlowingButton>
-          <p className="mt-10 text-sm text-slate-500 italic font-light tracking-wide">Founder's pricing is available for a limited time.</p>
-        </ScrollReveal>
-      </section>
-
+      {/* Footer */}
       <footer className="px-6 py-20 bg-black border-t border-white/5 text-center font-sans px-4">
         <div className="max-w-xl mx-auto">
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-block group mb-10">
@@ -709,116 +707,73 @@ const App = () => {
           </div>
         </ScrollReveal>
 
-        {/* Pricing Tiers */}
+        {/* REFINED PRICING TIERS */}
         <section className="mb-40 overflow-visible pt-10">
           <ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 items-stretch mt-12 px-4 md:px-0 overflow-visible">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-8 items-stretch mt-12 px-4 md:px-0 overflow-visible max-w-4xl mx-auto">
+              
+              {/* TIER 1: Conversion Hub (Updated Button: Buy Now) */}
               <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border-2 border-amber-500/40 flex flex-col shadow-2xl overflow-visible">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap shadow-xl z-30">Founder's Special</div>
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap shadow-xl z-30 font-black">Entry Tier</div>
                 <div className="text-center mb-10 pt-8">
-                  <span className="text-slate-500 text-sm font-bold line-through">REGULAR $997</span>
-                  <div className="flex justify-center items-center mt-1 font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">797</span></div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase mt-4 tracking-widest">One-Time Setup</p>
+                  <div className="flex justify-center items-center font-black">
+                    <span className="text-2xl text-slate-500 mr-1">$</span>
+                    <span className="text-7xl text-white tracking-tighter">197</span>
+                  </div>
+                  <p className="text-[10px] font-black text-amber-500 uppercase mt-4 tracking-widest font-black">Setup + $20/month</p>
                 </div>
-                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">2-Page Brand Build</h4>
+                <h4 className="text-xl font-black text-center mb-4 uppercase tracking-tight">Conversion Hub</h4>
+                <p className="text-xs text-slate-500 text-center mb-8 italic font-medium leading-relaxed">A premium personal landing system built in 72 hours.</p>
                 <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
-                  {["Brand + Clarity Landing", "Next-Step Action Page", "Mobile-First Design", "Hosted Setup & Launch", "Strategic Layout"].map((f, i) => (
+                  {["Single Premium Landing Page", "Optimized Mobile Flow", "Custom CTA Architecture", "72-Hour Deployment", "Global Edge Hosting"].map((f, i) => (
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" onClick={() => openInquiry("Reserve Founder Build")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Reserve Founder Build</GlowingButton>
+                {/* SUGGESTED INSTANT BUY BUTTON */}
+                <GlowingButton variant="none" onClick={() => openInquiry("Conversion Hub - Buy Now")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Buy Now</GlowingButton>
               </div>
 
+              {/* TIER 2: Website Builds */}
               <div className="bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/5 flex flex-col shadow-lg">
                 <div className="text-center mb-10 pt-8">
-                  <div className="flex justify-center items-center font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">1497</span></div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest font-black">Premium Setup</p>
+                  <div className="flex flex-col justify-center items-center font-black">
+                    <span className="text-xs text-slate-600 uppercase tracking-widest mb-1 font-black">Starting at</span>
+                    <div className="flex items-center">
+                      <span className="text-2xl text-slate-500 mr-1">$</span>
+                      <span className="text-7xl text-white tracking-tighter">997</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest font-black">Strategic Build</p>
                 </div>
-                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight">3-Page Custom Site</h4>
+                <h4 className="text-xl font-black text-center mb-4 uppercase tracking-tight">Website Builds</h4>
+                <p className="text-xs text-slate-500 text-center mb-8 italic font-medium leading-relaxed">Custom high-converting websites tailored to your business goals.</p>
                 <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
-                  {["Everything in Founder's", "Custom Interior Page", "Enhanced Visual Content", "Priority Strategy Session", "Custom Brand Styling"].map((f, i) => (
+                  {["Strategic Multi-Page Build", "Custom Brand Development", "Deep SEO Implementation", "Integrated Sales Systems", "High-Volume Infrastructure"].map((f, i) => (
                     <div key={i} className="flex items-center space-x-3 text-xs md:text-sm"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" theme="silver" onClick={() => openInquiry("Start Premium Project")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Start Premium Project</GlowingButton>
-              </div>
-
-              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/10 flex flex-col shadow-lg overflow-visible">
-                <div className="text-center mb-10 pt-8">
-                  <div className="flex justify-center items-center font-black"><span className="text-2xl text-slate-500 mr-1">$</span><span className="text-7xl text-white tracking-tighter">2397</span></div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest font-black">Authority Setup</p>
-                </div>
-                <h4 className="text-xl font-black text-center mb-6 uppercase tracking-tight text-white">Complete Presence</h4>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
-                  {[
-                    "Full 5-Page Architecture",
-                    "Integrated Professional Blog",
-                    "SEO & AEO Optimized (AI Search)",
-                    "Premium Site Management",
-                    "Advanced Multi-Page Flow"
-                  ].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
-                  ))}
-                  <div className="pt-4 border-t border-white/5 space-y-3">
-                    <div className="flex items-center space-x-3 text-slate-500"><FileText className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase tracking-widest font-black">$125/Professional Blog Post</span></div>
-                    <div className="flex items-center space-x-3 text-slate-500"><Search className="w-4 h-4 text-slate-600" /><span className="text-[9px] font-black uppercase text-amber-500/80 tracking-widest font-black">Optimized for AI Search</span></div>
-                  </div>
-                </div>
-                <GlowingButton variant="none" theme="silver" onClick={() => openInquiry("Begin Full Architecture")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Begin Full Architecture</GlowingButton>
+                <GlowingButton variant="none" theme="silver" onClick={() => openInquiry("Website Build - Request")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Request Project</GlowingButton>
               </div>
             </div>
           </ScrollReveal>
         </section>
 
-        {/* Support Plan */}
+        {/* Management Support */}
         <section className="mb-40" id="support-plan">
           <ScrollReveal>
             <div className="text-center mb-16 max-w-md mx-auto px-4">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">Ongoing Support</h2>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">Ongoing Management</h2>
               <div className="relative p-10 rounded-[48px] bg-slate-900 border-2 border-amber-500/20 shadow-3xl text-center hover:border-amber-500/40 transition-all group">
                 <div className="flex flex-col items-center mb-10">
                   <div className="flex items-baseline font-sans font-black"><span className="text-2xl font-black text-slate-500 mr-1">$</span><span className="text-7xl font-black text-white tracking-tighter">125</span><span className="text-slate-500 text-xs font-black ml-2 uppercase tracking-widest font-black">/ month</span></div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase mt-4 italic tracking-widest font-black">Professional Management</p>
                 </div>
-                <div className="space-y-4 mb-10 text-left text-sm text-slate-300 font-medium">
-                  {["Global edge network hosting", "Secure SSL & uptime monitoring", "Unlimited global bandwidth", "1 Professional edit per month", "Text or image swaps included", "DM or Email technical support"].map((f, i) => (
+                <div className="space-y-4 mb-10 text-left text-sm text-slate-300 font-medium italic">
+                  {["Global edge network hosting", "Secure SSL & 24/7 monitoring", "Managed bandwidth scaling", "1 Professional edit per month"].map((f, i) => (
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500" /><span>{f}</span></div>
                   ))}
                 </div>
-                <GlowingButton variant="none" onClick={() => openInquiry("Start Support Plan")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Start Support Plan</GlowingButton>
+                <GlowingButton variant="none" onClick={() => openInquiry("Management Plan")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Start Support Plan</GlowingButton>
               </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Blog Bundles */}
-        <section className="mb-40">
-          <ScrollReveal>
-            <div className="text-center mb-16">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">Growth Engines</h2>
-              <h3 className="text-4xl md:text-5xl font-black mb-6 uppercase tracking-tight">BLOG CONTENT BUNDLES.</h3>
-              <p className="text-slate-400 text-lg font-light max-w-2xl mx-auto italic px-4">Professional, high-precision content designed to rank on Google and AI search engines.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch px-4 md:px-0">
-              {[
-                { name: "Starter Bundle", posts: "4", price: "500", desc: "Consistency for growing brands." },
-                { name: "Authority Bundle", posts: "8", price: "900", desc: "Command your niche with depth." },
-                { name: "Elite Bundle", posts: "12", price: "1200", desc: "Maximum visibility and AI relevance." }
-              ].map((b, i) => (
-                <div key={i} className="bg-slate-900 border border-white/10 p-10 rounded-[48px] flex flex-col items-center text-center hover:border-amber-500/30 transition-all shadow-xl group">
-                  <div className="p-4 bg-amber-500/10 rounded-2xl mb-8 group-hover:scale-110 transition-transform"><PenTool className="w-6 h-6 text-amber-500" /></div>
-                  <h4 className="text-xl font-black uppercase mb-2">{b.name}</h4>
-                  <p className="text-[10px] font-black text-amber-500/60 uppercase tracking-widest mb-6">{b.posts} Professional Posts / Month</p>
-                  <div className="flex items-baseline mb-8 font-black">
-                    <span className="text-xl text-slate-500 mr-1">$</span>
-                    <span className="text-6xl text-white tracking-tighter">{b.price}</span>
-                    <span className="text-slate-500 text-xs ml-2 uppercase tracking-widest font-black">/ month</span>
-                  </div>
-                  <p className="text-sm text-slate-400 font-medium italic mb-10">{b.desc}</p>
-                  <GlowingButton variant="none" small theme="silver" onClick={() => openInquiry(`Start ${b.name}`)} className="w-full py-4 uppercase tracking-widest font-black">Start Bundle</GlowingButton>
-                </div>
-              ))}
             </div>
           </ScrollReveal>
         </section>
@@ -830,7 +785,7 @@ const App = () => {
               <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none duration-1000"><Globe className="w-64 h-64 text-amber-500" /></div>
               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black tracking-widest uppercase">CUSTOM SOLUTIONS</h2>
               <h3 className="text-4xl md:text-8xl font-black mb-10 tracking-tighter uppercase leading-[0.9] text-white max-w-4xl text-center">CUSTOM <br className="md:hidden" /> ARCHITECTURE.</h3>
-              <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12 px-4 italic">For businesses that need personal hosting, high-volume architecture, or fully custom designs. Projects offered selectively to ensure elite quality.</p>
+              <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12 px-4 italic text-center">High-volume infrastructure and fully bespoke software designs. <br/> Offered selectively to ensure elite build quality.</p>
               <div className="flex flex-col items-center">
                 <button 
                   onClick={() => openInquiry("Request Custom Architecture")}
@@ -848,7 +803,7 @@ const App = () => {
         <section className="py-24 border-y border-white/5 bg-slate-900/50">
           <div className="max-w-6xl mx-auto px-6 text-center">
             <ScrollReveal>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500 mb-8">Process Over Promises</h2>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black uppercase">Process Over Promises</h2>
               <h3 className="text-3xl md:text-5xl font-black mb-12 uppercase tracking-tighter leading-tight text-white max-w-4xl mx-auto">Built With Structure. <br className="hidden md:block" /> Delivered With Precision.</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 border-t border-white/5 pt-12">
                 {[
@@ -859,7 +814,7 @@ const App = () => {
                 ].map((item, i) => (
                   <div key={i} className="flex flex-col items-center md:items-start text-center md:text-left space-y-2">
                     <CheckCircle2 className="w-4 h-4 text-amber-500 mb-2" />
-                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 leading-relaxed">
+                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 leading-relaxed font-black">
                       {item}
                     </span>
                   </div>
