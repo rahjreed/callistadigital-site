@@ -50,7 +50,6 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
   const [status, setStatus] = useState('idle'); // 'idle', 'submitting', 'success'
   const [formData, setFormData] = useState({
     firstName: '',
-    lastName: '',
     email: '',
     phone: '',
     comments: ''
@@ -65,7 +64,6 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
     const kitData = new FormData();
     kitData.append('fields[first_name]', formData.firstName);
     kitData.append('email_address', formData.email);
-    kitData.append('fields[last_name]', formData.lastName);
     kitData.append('fields[phone_number]', formData.phone);
     kitData.append('fields[package_selected]', selectedPackage);
     kitData.append('fields[comments]', `Package: ${selectedPackage}\nPhone: ${formData.phone}\nMessage: ${formData.comments}`);
@@ -100,29 +98,16 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
             </h3>
             
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">First Name</label>
-                  <input 
-                    required
-                    type="text" 
-                    className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                    placeholder="First Name"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Last Name</label>
-                  <input 
-                    required
-                    type="text" 
-                    className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                    placeholder="Last Name"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                  />
-                </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">First Name</label>
+                <input 
+                  required
+                  type="text" 
+                  className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
+                  placeholder="Your Name"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                />
               </div>
 
               <div className="space-y-2">
@@ -131,7 +116,7 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
                   required
                   type="email" 
                   className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                  placeholder="Email Address"
+                  placeholder="email@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
@@ -153,7 +138,7 @@ const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Comments / Business Goals</label>
                 <textarea 
                   className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800 min-h-[100px] resize-none"
-                  placeholder="Tell us about your brand..."
+                  placeholder="Tell us about your brand or specific project needs..."
                   value={formData.comments}
                   onChange={(e) => setFormData({...formData, comments: e.target.value})}
                 />
@@ -251,8 +236,8 @@ const ChatBot = ({ messages, setMessages }) => {
     }
 
     const systemPrompt = `You are a professional Digital Strategist for Callista Digital. 
-    Our updated agency pricing model:
-    - Conversion Hub: $197 setup + $20/month. Instant product. Premium personal landing system built in 72 hours.
+    Our agency pricing model:
+    - Conversion Hub: $197 setup + $20/month. Premium personal landing system built in 72 hours.
     - Website Builds: Starting at $997. Strategic upgrade path. Custom high-converting websites.
     
     Professional Management: $125/mo for general maintenance and updates.
@@ -366,7 +351,7 @@ const GlowingButton = ({ onClick, children, className = "", isLink = false, href
   const classes = `group relative p-[1.5px] inline-block overflow-hidden rounded-full transition-all duration-300 hover:scale-[1.03] active:scale-95 ${currentTheme.shadow} ${className}`;
   
   if (isLink) {
-    return <a href={href} className={classes}>{content}</a>;
+    return <a href={href} target={href.startsWith('mailto') ? '_self' : '_blank'} rel="noopener noreferrer" className={classes}>{content}</a>;
   }
   
   return <button onClick={onClick} className={classes}>{content}</button>;
@@ -383,7 +368,7 @@ const App = () => {
   ]);
   
   const HERO_IMAGE = "https://images.travelprox.com/callista/cdhero.png";
-  const WOMAN_IMAGE = "https://images.travelprox.com/callista/woman.png";
+  const RAHJ_IMAGE = "https://images.travelprox.com/callista/rahj1.png";
 
   useEffect(() => window.scrollTo(0, 0), [view]);
 
@@ -470,14 +455,14 @@ const App = () => {
         </div>
       </section>
 
-      {/* Authority Section */}
+      {/* The Authority Section */}
       <section className="px-6 py-24 md:py-32 bg-slate-900 relative border-y border-white/5 shadow-inner">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
               <div className="relative">
                 <div className="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 blur-[60px] rounded-full" />
-                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white font-black uppercase">THE AUTHORITY</h2>
+                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white font-black uppercase tracking-widest">THE AUTHORITY</h2>
                 <p className="text-3xl md:text-6xl font-black leading-[1.1] mb-8 text-white uppercase tracking-tight">
                   We turn digital chaos <br className="hidden md:block" /> into <span className="text-slate-500">elegant command.</span>
                 </p>
@@ -595,24 +580,9 @@ const App = () => {
               <div className="flex items-center space-x-3 uppercase"><div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /><p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 font-black tracking-widest">Callista Digital Strategy</p></div>
             </div>
             <div className="relative min-h-[400px] md:min-h-[600px] bg-slate-950 overflow-hidden order-1 lg:order-2">
-              <img src={WOMAN_IMAGE} alt="Founder" className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105 opacity-80" />
+              <img src={RAHJ_IMAGE} alt="Founder" className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105 opacity-80" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
             </div>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* Social Proof stats */}
-      <section className="px-6 py-24 bg-white text-slate-950 text-center shadow-2xl">
-        <ScrollReveal>
-          <div className="flex justify-center space-x-2 mb-10">
-            {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-8 h-8 md:w-12 md:h-12 text-amber-500 fill-amber-500" />)}
-          </div>
-          <h2 className="text-4xl md:text-7xl font-black mb-16 tracking-tighter uppercase leading-[0.9]">TRUSTED BY <br/> MODERN LEADERS.</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left max-w-6xl mx-auto">
-            {[{ l: "Experience", v: "10+ Years" }, { l: "Focus", v: "Conversion" }, { l: "Systems", v: "Custom Built" }].map((stat, i) => (
-              <div key={i} className="border-t-4 border-slate-950 pt-8 shadow-sm"><p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">{stat.l}</p><p className="text-3xl font-black">{stat.v}</p></div>
-            ))}
           </div>
         </ScrollReveal>
       </section>
@@ -707,12 +677,12 @@ const App = () => {
           </div>
         </ScrollReveal>
 
-        {/* REFINED PRICING TIERS */}
+        {/* PRICING TIERS */}
         <section className="mb-40 overflow-visible pt-10">
           <ScrollReveal>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-8 items-stretch mt-12 px-4 md:px-0 overflow-visible max-w-4xl mx-auto">
               
-              {/* TIER 1: Conversion Hub (Updated Button: Buy Now) */}
+              {/* TIER 1: Conversion Hub (Updated to Request Project) */}
               <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border-2 border-amber-500/40 flex flex-col shadow-2xl overflow-visible">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap shadow-xl z-30 font-black">Entry Tier</div>
                 <div className="text-center mb-10 pt-8">
@@ -729,8 +699,7 @@ const App = () => {
                     <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
                   ))}
                 </div>
-                {/* SUGGESTED INSTANT BUY BUTTON */}
-                <GlowingButton variant="none" onClick={() => openInquiry("Conversion Hub - Buy Now")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Buy Now</GlowingButton>
+                <GlowingButton variant="none" onClick={() => openInquiry("Conversion Hub - Request")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Request Project</GlowingButton>
               </div>
 
               {/* TIER 2: Website Builds */}
