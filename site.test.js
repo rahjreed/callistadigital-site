@@ -32,7 +32,7 @@ test('home and Creator Tools serve separate documents with canonical metadata', 
 test('unknown routes remain 404s and local artwork is served as images', async () => {
   const missing = await fetch(origin + '/missing-page');
   assert.equal(missing.status, 404);
-  for (const path of ['/favicon.png', '/work/callista-wordmark.png', '/work/prompterson.svg', '/work/kingdom-race.webp']) {
+  for (const path of ['/favicon.png', '/work/callista-hero.jpg', '/work/callista-wordmark.png', '/work/prompterson.svg', '/work/kingdom-race.webp']) {
     const asset = await fetch(origin + path);
     assert.equal(asset.status, 200);
     assert.match(asset.headers.get('content-type'), /^image\//);

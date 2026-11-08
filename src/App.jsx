@@ -26,7 +26,7 @@ const services = [
 function Brand() {
   return <a className="brand" href="/">
     <img src="/favicon.png" width="39" height="39" alt="" />
-    <span>Callista <span>Digital</span></span>
+    <span>Callista Digital</span>
   </a>;
 }
 
@@ -51,34 +51,6 @@ function Footer() {
       <a href={'mailto:' + email}>{email}</a>
     </div>
   </footer>;
-}
-
-function StudioGraphic() {
-  return <div className="studio-graphic" aria-hidden="true">
-    <div className="graphic-head"><span>CALLISTA DIGITAL</span><span>STUDIO / 01</span></div>
-    <svg viewBox="0 0 460 305" fill="none">
-      <defs>
-        <pattern id="studio-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-          <path d="M24 0H0V24" stroke="#343340" strokeWidth="1" />
-        </pattern>
-        <linearGradient id="studio-gold" x1="91" y1="60" x2="353" y2="263" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#ffe599" /><stop offset="1" stopColor="#ab722c" />
-        </linearGradient>
-      </defs>
-      <path fill="url(#studio-grid)" d="M0 0H460V305H0z" />
-      <circle cx="230" cy="152" r="122" stroke="#52493c" strokeDasharray="3 6" />
-      <path d="M230 25v255M103 152h254" stroke="#585044" strokeDasharray="3 6" />
-      <g className="studio-orbit">
-        <path d="m230 46 124 72v74l-124 72-124-72v-74l124-72Z" fill="#1f1e26" stroke="url(#studio-gold)" />
-        <path d="m106 118 124 72 124-72M230 190v74m-124-99 124 72 124-72M106 142l124 72 124-72" stroke="url(#studio-gold)" />
-        <path d="m230 46 124 72-124 72-124-72 124-72Z" fill="#332a24" stroke="url(#studio-gold)" />
-        <path d="m230 75 75 43-75 43-75-43 75-43Z" fill="#e7b65b" fillOpacity=".16" stroke="#e7b65b" />
-        <path d="m230 94 42 24-42 24-42-24 42-24Z" fill="#e7b65b" />
-      </g>
-      <path d="M70 95h45m238 113h40M70 91v8m323 105v8" stroke="#e7b65b" />
-    </svg>
-    <div className="graphic-foot"><span>WEB / APPLICATIONS / TOOLS</span><span>+</span></div>
-  </div>;
 }
 
 function ToolsGrid() {
@@ -116,8 +88,9 @@ function ProjectCard({ project }) {
 
 function Home() {
   return <>
-    <section className="hero shell">
-      <div className="hero-copy">
+    <section className="hero">
+      <div className="hero-art" aria-hidden="true" />
+      <div className="shell hero-copy">
         <p className="eyebrow"><span className="signal" /> Independent web & software studio</p>
         <h1>Websites, Apps &amp; Digital Tools That <em>Move Business Forward.</em></h1>
         <p className="lede">We build modern websites, custom applications, and practical digital solutions that help businesses grow, connect with customers, and work smarter.</p>
@@ -126,7 +99,6 @@ function Home() {
           <a className="button secondary" href="#work">Explore Our Work <ArrowDown aria-hidden="true" size={18} /></a>
         </div>
       </div>
-      <StudioGraphic />
     </section>
 
     <section className="band" id="services" aria-labelledby="services-title">
@@ -193,11 +165,13 @@ function Home() {
 }
 
 function CreatorTools() {
-  return <section className="shell section tools-page" aria-labelledby="tools-title">
-    <p className="eyebrow"><span className="signal" /> Callista Digital / Utilities</p>
-    <h1 id="tools-title">Creator Tools</h1>
-    <p className="lede">Browser-based utilities for creators and small teams. Explore what’s available and what we’re building next.</p>
-    <ToolsGrid />
+  return <section className="tools-page" aria-labelledby="tools-title">
+    <div className="shell section">
+      <p className="eyebrow"><span className="signal" /> Callista Digital / Utilities</p>
+      <h1 id="tools-title">Creator Tools</h1>
+      <p className="lede">Browser-based utilities for creators and small teams. Explore what’s available and what we’re building next.</p>
+      <ToolsGrid />
+    </div>
   </section>;
 }
 
