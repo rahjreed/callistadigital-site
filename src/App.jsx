@@ -1,820 +1,191 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Instagram, 
-  ExternalLink, 
-  CheckCircle2, 
-  ArrowRight, 
-  ChevronRight, 
-  User, 
-  Layout, 
-  Zap, 
-  History,
-  Sparkles, 
-  Globe,
-  Loader2,
-  Camera,
-  Star, 
-  ShieldCheck, 
-  ZapOff,
-  ShoppingBag,
-  Timer,
-  CreditCard,
-  Clock,
-  Mail,
-  XCircle,
-  Info,
-  Home,
-  Network,
-  X,
-  Layers,
-  FileText,
-  Search,
-  MessageSquare,
-  Send,
-  Minimize2,
-  PenTool,
-  Quote,
-  Plus,
-  Minus,
-  Check
+import React, { useLayoutEffect } from 'react';
+import {
+  ArrowDown, ArrowRight, ArrowUpRight, Braces, Camera, Gamepad2, Globe2,
+  House, Layers3, Mail, MonitorSmartphone, Radio, Workflow,
 } from 'lucide-react';
+import { email, projects, tools } from './site.js';
 
-const apiKey = "";
-const TEXT_LOGO = "https://images.travelprox.com/callista/textlogo.png";
-const FAVICON = "https://images.travelprox.com/callista/favicon.png";
-const CONTACT_EMAIL = "hello@callistadigital.com";
-const INSTAGRAM_URL = "https://www.instagram.com/callistadigital";
+const navigation = [
+  ['Home', '/'],
+  ['Services', '/#services'],
+  ['Our Work', '/#work'],
+  ['Creator Tools', '/tools'],
+  ['About', '/#about'],
+  ['Contact', '/#contact'],
+];
 
-// --- Inquiry Modal Component (Integrated with Kit) ---
-const InquiryModal = ({ isOpen, onClose, selectedPackage }) => {
-  const [status, setStatus] = useState('idle'); // 'idle', 'submitting', 'success'
-  const [formData, setFormData] = useState({
-    firstName: '',
-    email: '',
-    phone: '',
-    comments: ''
-  });
+const services = [
+  [Globe2, 'Websites & landing pages', 'Make a strong first impression, explain your offer clearly, and give visitors a clear next step on any screen.'],
+  [MonitorSmartphone, 'Custom apps & portals', 'Give customers a place to get things done and your team a better way to manage the work behind it.'],
+  [Layers3, 'Progressive web apps', 'Give repeat visitors an app-like experience they can open in a browser and install on supported devices.'],
+  [Workflow, 'Lead capture & integrations', 'Connect inquiry forms to the tools your team already uses so new leads reach the right people.'],
+  [Gamepad2, 'Games, quizzes & learning', 'Help people learn, practice, and remember through interactive experiences they can play in a browser.'],
+  [Braces, 'Creator tools & utilities', 'Turn repetitive tasks into focused browser tools that make everyday work easier.'],
+];
 
-  if (!isOpen) return null;
+function Brand() {
+  return <a className="brand" href="/">
+    <img src="/favicon.png" width="39" height="39" alt="" />
+    <span>Callista Digital</span>
+  </a>;
+}
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus('submitting');
-
-    const kitData = new FormData();
-    kitData.append('fields[first_name]', formData.firstName);
-    kitData.append('email_address', formData.email);
-    kitData.append('fields[phone_number]', formData.phone);
-    kitData.append('fields[package_selected]', selectedPackage);
-    kitData.append('fields[comments]', `Package: ${selectedPackage}\nPhone: ${formData.phone}\nMessage: ${formData.comments}`);
-
-    try {
-      await fetch("https://app.kit.com/forms/9036743/subscriptions", {
-        method: "POST",
-        body: kitData,
-        mode: 'no-cors'
-      });
-      setStatus('success');
-    } catch (error) {
-      console.error("Submission error", error);
-      setStatus('idle');
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center px-4 overflow-y-auto py-10">
-      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
-      
-      <div className="relative w-full max-w-xl bg-slate-900 border border-white/10 rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-        <button onClick={onClose} className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors z-10">
-          <X className="w-6 h-6" />
-        </button>
-
-        {status !== 'success' ? (
-          <div className="p-8 md:p-12">
-            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-4">Inquiry</h2>
-            <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight mb-8">
-              {selectedPackage || "Work With Us"}
-            </h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">First Name</label>
-                <input 
-                  required
-                  type="text" 
-                  className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                  placeholder="Your Name"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Email Address</label>
-                <input 
-                  required
-                  type="email" 
-                  className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                  placeholder="email@example.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Phone Number</label>
-                <input 
-                  required
-                  type="tel" 
-                  className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800"
-                  placeholder="Phone Number"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Comments / Business Goals</label>
-                <textarea 
-                  className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-800 min-h-[100px] resize-none"
-                  placeholder="Tell us about your brand or specific project needs..."
-                  value={formData.comments}
-                  onChange={(e) => setFormData({...formData, comments: e.target.value})}
-                />
-              </div>
-
-              <button 
-                type="submit"
-                disabled={status === 'submitting'}
-                className="w-full bg-amber-500 text-slate-950 font-black uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-white hover:scale-[1.02] transition-all shadow-xl shadow-amber-500/10 flex items-center justify-center space-x-3"
-              >
-                {status === 'submitting' ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <span>Send Request</span>
-                )}
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="p-12 text-center space-y-8 animate-in fade-in slide-in-from-bottom-4">
-            <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto border border-amber-500/20">
-              <Check className="w-10 h-10 text-amber-500" />
-            </div>
-            <div>
-              <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Request Received</h3>
-              <p className="text-slate-400 font-light leading-relaxed">
-                Thank you, {formData.firstName}. Your inquiry for {selectedPackage} has been logged. A strategist will contact you shortly.
-              </p>
-            </div>
-            <button 
-              onClick={onClose}
-              className="px-10 py-4 border border-white/10 rounded-full text-xs font-black uppercase tracking-widest hover:bg-white hover:text-slate-950 transition-all"
-            >
-              Close
-            </button>
-          </div>
-        )}
-      </div>
+function Header({ toolsPage }) {
+  return <header className="header">
+    <div className="shell header-inner">
+      <Brand />
+      <nav aria-label="Main navigation">
+        {navigation.map(([label, url]) => (
+          <a key={label} href={url} aria-current={url === (toolsPage ? '/tools' : '/') ? 'page' : undefined}>{label}</a>
+        ))}
+      </nav>
     </div>
-  );
-};
+  </header>;
+}
 
-// --- FAQ Component ---
-const FAQItem = ({ question, answer, isOpen, onClick }) => {
-  const contentRef = useRef(null);
-  
-  return (
-    <div className="border-b border-white/10 overflow-hidden">
-      <button 
-        onClick={onClick}
-        className="w-full py-8 flex justify-between items-center text-left group transition-all"
-      >
-        <span className={`text-lg md:text-xl font-bold uppercase tracking-tight transition-colors ${isOpen ? 'text-amber-500' : 'text-white group-hover:text-amber-500/80'}`}>
-          {question}
-        </span>
-        <div className={`shrink-0 ml-4 p-2 rounded-full border transition-all ${isOpen ? 'bg-amber-500 border-amber-500 text-slate-950 rotate-0' : 'border-white/20 text-white rotate-0 group-hover:border-amber-500/50'}`}>
-          {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+function Footer() {
+  return <footer className="footer">
+    <div className="shell footer-inner">
+      <Brand />
+      <p>Independent web & software studio</p>
+      <a href={'mailto:' + email}>{email}</a>
+    </div>
+  </footer>;
+}
+
+function ToolsGrid() {
+  return <div className="tools-grid">
+    {tools.map(({ name, description, url, icon: Icon }) => (
+      <article className="tool-card" key={name}>
+        <div className="tool-top">
+          <span className="tool-icon"><Icon aria-hidden="true" size={23} /></span>
+          <span className={'status' + (url ? ' available' : '')}>{url ? 'Available Now' : 'Coming Soon'}</span>
         </div>
-      </button>
-      <div 
-        ref={contentRef}
-        style={{ height: isOpen ? contentRef.current?.scrollHeight : 0 }}
-        className="transition-all duration-300 ease-in-out overflow-hidden"
-      >
-        <div className="pb-8 text-slate-400 text-base md:text-lg leading-relaxed font-light whitespace-pre-line">
-          {answer}
+        <h2 className="tool-title">{name}</h2>
+        <p>{description}</p>
+        {url && <a className="text-link" href={url}>Launch Tool <ArrowUpRight aria-hidden="true" size={18} /></a>}
+      </article>
+    ))}
+  </div>;
+}
+
+function ProjectCard({ project }) {
+  const { name, category, description, url, action, artwork, image } = project;
+  return <article className="project-card">
+    <div className={'project-art ' + artwork} aria-hidden="true">
+      {image && <img src={image} alt="" />}
+      {artwork === 'close' && <House size={80} strokeWidth={1} />}
+      {artwork === 'roger' && <Radio size={80} strokeWidth={1} />}
+    </div>
+    <div className="project-copy">
+      <p className="eyebrow">{category}</p>
+      <h3>{name}</h3>
+      <p>{description}</p>
+      <a className="text-link" href={url}>{action} <ArrowUpRight aria-hidden="true" size={18} /></a>
+    </div>
+  </article>;
+}
+
+function Home() {
+  return <>
+    <section className="hero">
+      <div className="hero-art" aria-hidden="true" />
+      <div className="shell hero-copy">
+        <p className="eyebrow"><span className="signal" /> Independent web & software studio</p>
+        <h1>Websites, Apps &amp; Digital Tools That <em>Move Business Forward.</em></h1>
+        <p className="lede">We build modern websites, custom applications, and practical digital solutions that help businesses grow, connect with customers, and work smarter.</p>
+        <div className="actions">
+          <a className="button primary" href="#contact">Start Your Project <ArrowRight aria-hidden="true" size={19} /></a>
+          <a className="button secondary" href="#work">Explore Our Work <ArrowDown aria-hidden="true" size={18} /></a>
         </div>
       </div>
-    </div>
-  );
-};
+    </section>
 
-// --- ChatBot Component ---
-const ChatBot = ({ messages, setMessages }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const callGemini = async (userQuery, retryCount = 0) => {
-    const userMsgCount = messages.filter(m => m.role === 'user').length + 1;
-    
-    let contactInstruction = "";
-    if (userMsgCount === 2 || (userMsgCount > 2 && (userMsgCount - 2) % 3 === 0)) {
-       contactInstruction = `\n\nREQUIRED ACTION: You must now end this specific message by telling the user the best way to get started is to use the "Request" buttons on the pricing page or email ${CONTACT_EMAIL}.`;
-    }
-
-    const systemPrompt = `You are a professional Digital Strategist for Callista Digital. 
-    Our agency pricing model:
-    - Conversion Hub: $197 setup + $20/month. Premium personal landing system built in 72 hours.
-    - Website Builds: Starting at $997. Strategic upgrade path. Custom high-converting websites.
-    
-    Professional Management: $125/mo for general maintenance and updates.
-    
-    CRITICAL FORMATTING RULES:
-    - Communicate in PLAIN TEXT ONLY.
-    - RESPOND WITH 1 TO 2 SENTENCES MAX.
-    - AFTER YOUR RESPONSE, ALWAYS ASK A DISCOVERY QUESTION.
-    - Be elite, professional, and minimalist in your tone. Use "We" instead of "I".
-    ${contactInstruction}`;
-
-    try {
-      const response = await fetch("/api/gemini", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery, systemPrompt }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error("Chat failed");
-
-      return data.text || "System unavailable.";
-    } catch (error) {
-      if (retryCount < 3) return callGemini(userQuery, retryCount + 1);
-      return `We are experiencing a connection delay. Please reach out to ${CONTACT_EMAIL}!`;
-    }
-  };
-
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    const userMessage = input.trim();
-    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
-    setInput('');
-    setIsLoading(true);
-    const aiResponse = await callGemini(userMessage);
-    setMessages(prev => [...prev, { role: 'assistant', text: aiResponse }]);
-    setIsLoading(false);
-  };
-
-  return (
-    <div className="fixed bottom-6 right-6 z-[100] font-sans">
-      {isOpen ? (
-        <div className="w-[320px] md:w-[380px] h-[500px] bg-slate-900 border border-amber-500/30 rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-          <div className="p-5 bg-slate-950 border-b border-white/5 flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <img 
-                src={FAVICON} 
-                alt="Favicon" 
-                className="w-8 h-8 rounded-lg border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.3)] object-contain" 
-              />
-              <span className="text-xs font-black uppercase tracking-widest text-white">Strategist</span>
-            </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white transition-colors"><Minimize2 className="w-4 h-4" /></button>
-          </div>
-          <div ref={scrollRef} className="flex-grow p-5 overflow-y-auto space-y-4 scrollbar-hide">
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg ${m.role === 'user' ? 'bg-amber-500 text-slate-950 rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-white/5'}`}>
-                  {m.text}
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-               <div className="flex justify-start">
-                 <div className="bg-slate-800 p-4 rounded-2xl rounded-tl-none border border-white/5">
-                   <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-                 </div>
-               </div>
-            )}
-          </div>
-          <div className="p-4 bg-slate-950 border-t border-white/5 flex space-x-2">
-            <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask a question..." className="flex-grow bg-slate-900 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none placeholder:text-slate-600" />
-            <button onClick={handleSend} disabled={isLoading} className="p-2 bg-amber-500 rounded-full text-slate-950 hover:scale-105 transition-transform disabled:opacity-50"><Send className="w-4 h-4" /></button>
-          </div>
+    <section className="band" id="services" aria-labelledby="services-title">
+      <div className="shell section">
+        <p className="eyebrow">01 / Services</p>
+        <h2 id="services-title">What we build</h2>
+        <p className="intro">From a first impression on the web to the software your customers use every day.</p>
+        <div className="service-grid">
+          {services.map(([Icon, title, description]) => <article className="service-card" key={title}>
+            <Icon aria-hidden="true" size={24} />
+            <h3>{title}</h3>
+            <p>{description}</p>
+          </article>)}
         </div>
-      ) : (
-        <button onClick={() => setIsOpen(true)} className="w-14 h-14 bg-slate-900 border border-amber-500/30 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all group">
-          <div className="absolute inset-0 bg-amber-500/10 rounded-full animate-ping group-hover:animate-none" />
-          <MessageSquare className="w-6 h-6 text-amber-500" />
-        </button>
-      )}
-    </div>
-  );
-};
+      </div>
+    </section>
 
-// --- Reusable Scroll Reveal ---
-const ScrollReveal = ({ children }) => {
-  const ref = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setIsVisible(true); }, { threshold: 0.1 });
-    if (ref.current) observer.observe(ref.current);
-    return () => ref.current && observer.unobserve(ref.current);
+    <section className="shell section" id="work" aria-labelledby="work-title">
+      <p className="eyebrow">02 / Portfolio</p>
+      <h2 id="work-title">Selected work</h2>
+      <p className="intro">Explore live examples of the sites, apps, and interactive experiences we build.</p>
+      <div className="project-grid">{projects.map(project => <ProjectCard key={project.name} project={project} />)}</div>
+    </section>
+
+    <section className="band" aria-labelledby="creator-title">
+      <div className="shell section split">
+        <div>
+          <p className="eyebrow">03 / Creator tools</p>
+          <h2 id="creator-title">Useful tools for everyday work</h2>
+          <p className="intro">Try our free video teleprompter and see what’s in development.</p>
+          <a className="text-link" href="/tools">Browse Creator Tools <ArrowRight aria-hidden="true" size={18} /></a>
+        </div>
+        <div className="tool-teaser">
+          <Camera aria-hidden="true" size={32} />
+          <span className="status available">Available Now</span>
+          <h3>Mr. Prompterson</h3>
+          <p>A free online teleprompter for video creators.</p>
+        </div>
+      </div>
+    </section>
+
+    <section className="shell section split" id="about" aria-labelledby="about-title">
+      <div>
+        <p className="eyebrow">04 / About</p>
+        <h2 id="about-title">About Callista Digital</h2>
+      </div>
+      <div className="about-copy">
+        <p>Callista Digital is an independent web and software studio. We build for businesses that need a better way to reach customers, deliver a service, or run a process.</p>
+        <p>We start with who will use the product and what they need to do. Those answers guide the design, the technology, and what goes into the first release.</p>
+      </div>
+    </section>
+
+    <section className="band" id="contact" aria-labelledby="contact-title">
+      <div className="shell section contact">
+        <p className="eyebrow">05 / Contact</p>
+        <h2 id="contact-title">Tell us about your project</h2>
+        <p className="intro">Share what you’re building, who it’s for, and what you’d like it to accomplish.</p>
+        <a className="button primary" href={'mailto:' + email + '?subject=Callista%20Digital%20project%20inquiry'}>
+          <Mail aria-hidden="true" size={19} /> {email}
+        </a>
+      </div>
+    </section>
+  </>;
+}
+
+function CreatorTools() {
+  return <section className="tools-page" aria-labelledby="tools-title">
+    <div className="shell section">
+      <p className="eyebrow"><span className="signal" /> Callista Digital / Utilities</p>
+      <h1 id="tools-title">Creator Tools</h1>
+      <p className="lede">Browser-based utilities for creators and small teams. Explore what’s available and what we’re building next.</p>
+      <ToolsGrid />
+    </div>
+  </section>;
+}
+
+export default function App({ toolsPage }) {
+  useLayoutEffect(() => {
+    // Cross-page fragment links can arrive before React mounts their targets.
+    const target = document.getElementById(window.location.hash.slice(1));
+    target?.scrollIntoView();
   }, []);
-  return <div ref={ref} className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>{children}</div>;
-};
 
-// --- Glowing Button ---
-const GlowingButton = ({ onClick, children, className = "", isLink = false, href = "", small = false, theme = "gold", variant = "spin" }) => {
-  const themes = {
-    gold: { spark: "conic-gradient(from 90deg at 50% 50%, transparent 0%, transparent 25%, #D4AF37 30%, transparent 35%, transparent 100%)", shadow: "shadow-[0_20px_40px_-15px_rgba(212,175,55,0.3)]", border: "border-amber-500/20" },
-    silver: { spark: "conic-gradient(from 90deg at 50% 50%, transparent 0%, transparent 25%, #94a3b8 30%, transparent 35%, transparent 100%)", shadow: "shadow-[0_20px_40px_-15px_rgba(148,163,184,0.1)]", border: "border-stone-700" }
-  };
-  const currentTheme = themes[theme] || themes.gold;
-  const content = (
-    <>
-      {variant === 'spin' && <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] group-hover:animate-[spin_1.5s_linear_infinite]" style={{ background: currentTheme.spark }} />}
-      <div className={`relative z-10 bg-slate-950 flex items-center justify-center text-white font-bold w-full h-full rounded-full border ${currentTheme.border} ${small ? 'px-4 py-2 text-[10px]' : 'px-10 py-5 text-base'}`}>{children}</div>
-    </>
-  );
-  const classes = `group relative p-[1.5px] inline-block overflow-hidden rounded-full transition-all duration-300 hover:scale-[1.03] active:scale-95 ${currentTheme.shadow} ${className}`;
-  
-  if (isLink) {
-    return <a href={href} target={href.startsWith('mailto') ? '_self' : '_blank'} rel="noopener noreferrer" className={classes}>{content}</a>;
-  }
-  
-  return <button onClick={onClick} className={classes}>{content}</button>;
-};
-
-// --- Main App ---
-const App = () => {
-  const [view, setView] = useState('home');
-  const [openFaq, setOpenFaq] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState("");
-  const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', text: "Hi, we are your Callista Digital strategists. How can we help you level up your online presence today?" }
-  ]);
-  
-  const HERO_IMAGE = "https://images.travelprox.com/callista/cdhero.png";
-  const RAHJ_IMAGE = "https://images.travelprox.com/callista/rahj1.png";
-
-  useEffect(() => window.scrollTo(0, 0), [view]);
-
-  const openInquiry = (pkg) => {
-    setSelectedPackage(pkg);
-    setModalOpen(true);
-  };
-
-  const faqs = [
-    {
-      q: "Why are Callista Digital websites harder to hack than WordPress?",
-      a: "Callista Digital sites are built as modern static web apps, not traditional WordPress installs. \n\nThat means: \n• No exposed admin login pages \n• No vulnerable plugin ecosystem \n• No PHP execution layer \n• No public database endpoints \n• No writable server files \n\nMost WordPress hacks happen through outdated plugins or login brute-force attacks. Our architecture removes those attack paths entirely. Nothing online is 100% unhackable — but our stack dramatically reduces real-world risk."
-    },
-    {
-      q: "So you don’t use WordPress at all?",
-      a: "Correct. We use a modern React + Vercel architecture designed for speed, security, and reliability. \n\nWordPress was built for blogs in 2003. We build infrastructure designed for modern performance and mobile-first traffic. You get faster load times, cleaner code, and a stronger SEO foundation without plugin chaos."
-    },
-    {
-      q: "What makes Callista Digital different from a normal web designer?",
-      a: "Most designers build websites. We build infrastructure. \n\nA typical designer delivers a theme and a plugin stack. Callista Digital delivers hardened architecture, global hosting, and performance-optimized systems designed to last. You’re not buying decoration. You’re buying engineered reliability."
-    },
-    {
-      q: "Will my site go down if traffic spikes?",
-      a: "Highly unlikely. Sites are deployed on Vercel’s global edge network — the same class of infrastructure used by major SaaS platforms. \n\nTraffic doesn’t crash a server. It distributes automatically. That means better uptime, faster response, and resilience under load."
-    },
-    {
-      q: "Can I make edits to my website?",
-      a: "Edits are requested through Callista Digital and handled by our team. We design sites using a scientific performance framework — layout, spacing, typography, and flow are engineered to guide behavior and maximize conversion. \n\nUncontrolled edits can unknowingly throw off results. Instead of handing you a fragile editor, we protect the integrity of the system and implement changes correctly. You request changes. We execute them safely."
-    },
-    {
-      q: "Will my site be fast on mobile?",
-      a: "Yes. Our sites are precompiled, optimized, and delivered through a global CDN. \n\nThere’s no plugin bloat slowing performance. Speed is engineered into the architecture."
-    },
-    {
-      q: "Is this overkill for a small business?",
-      a: "No. Small businesses are the ones most harmed by downtime and hacks. \n\nSecurity and speed aren’t luxury upgrades — they’re baseline protection. A slow or compromised site costs far more than prevention."
-    },
-    {
-      q: "Is this future-proof?",
-      a: "Yes. We build on actively developed, industry-standard technology used by modern web platforms. \n\nThis isn’t experimental. It’s where the web has already moved."
-    }
-  ];
-
-  const Header = () => (
-    <nav className="fixed top-0 left-0 w-full z-50 px-4 py-4">
-      <div className="max-w-6xl mx-auto flex justify-between items-center bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-full px-4 md:px-6 py-2 shadow-2xl">
-        <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => setView('home')}>
-          <img 
-            src={FAVICON} 
-            alt="Callista" 
-            className="w-8 h-8 rounded-lg border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.4)] transition-all duration-300 group-hover:rotate-12 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.6)] object-contain bg-slate-900" 
-          />
-          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white">CALLISTA DIGITAL</span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <GlowingButton small theme="silver" onClick={() => setView(view === 'home' ? 'pricing' : 'home')}>
-            {view === 'home' ? 'Pricing' : 'Home'}
-          </GlowingButton>
-        </div>
-      </div>
-    </nav>
-  );
-
-  const PageOne = () => (
-    <div className="bg-slate-950 text-white w-full font-sans overflow-x-hidden">
-      <Header />
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img src={HERO_IMAGE} alt="Hero" className="w-full h-full object-cover opacity-30" />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/40 to-slate-950" />
-        </div>
-        <div className="relative z-10 text-center max-w-6xl mx-auto">
-          <ScrollReveal>
-            <div className="inline-flex items-center space-x-2 px-4 py-2 mb-8 text-[10px] font-black tracking-[0.3em] uppercase bg-amber-500/10 text-amber-500 rounded-full border border-amber-500/20 backdrop-blur-sm">
-              <Sparkles className="w-3 h-3" /><span>Personal Brand Excellence</span>
-            </div>
-            <h1 className="text-5xl md:text-9xl font-black tracking-tighter mb-8 leading-[0.9] uppercase drop-shadow-2xl">LOOK <span className="text-amber-500">LEGIT</span> <br className="hidden md:block" /><span className="text-white/90">EVERYWHERE.</span></h1>
-            <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-2xl mx-auto font-light px-4 md:px-0 text-center">
-              Where beautifully crafted design meets intelligent precision.
-            </p>
-            <GlowingButton onClick={() => setView('pricing')} theme="gold">Get Started <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" /></GlowingButton>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* The Authority Section */}
-      <section className="px-6 py-24 md:py-32 bg-slate-900 relative border-y border-white/5 shadow-inner">
-        <div className="max-w-6xl mx-auto">
-          <ScrollReveal>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
-              <div className="relative">
-                <div className="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 blur-[60px] rounded-full" />
-                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 text-white font-black uppercase tracking-widest">THE AUTHORITY</h2>
-                <p className="text-3xl md:text-6xl font-black leading-[1.1] mb-8 text-white uppercase tracking-tight">
-                  We turn digital chaos <br className="hidden md:block" /> into <span className="text-slate-500">elegant command.</span>
-                </p>
-                <div className="h-1 w-20 bg-amber-500" />
-              </div>
-              <div className="space-y-6">
-                <p className="text-xl md:text-2xl text-white font-bold leading-relaxed">
-                  Your digital front door is your first impression.
-                </p>
-                <p className="text-lg md:text-xl text-slate-400 leading-relaxed font-light">
-                  We design beautifully crafted, hosted brand systems that make you look established, guide visitors effortlessly, and convert attention into action.
-                </p>
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* Expertise Cards */}
-      <section className="px-6 py-24 md:py-32 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {[
-            { title: "Splash Page Design", desc: "Minimalist, high-conversion layouts designed for impact.", icon: <Layout /> },
-            { title: "Strategic Architecture", desc: "Intentional page flows that lead visitors to action.", icon: <ChevronRight /> },
-            { title: "Social Traffic Mastery", desc: "Optimized specifically for high-volume profile clicks.", icon: <Zap /> },
-            { title: "Global Hosting", desc: "Ultra-fast, maintenance-free edge infrastructure.", icon: <Globe /> }
-          ].map((s, i) => (
-            <ScrollReveal key={i}>
-              <div className="group p-8 md:p-10 h-full rounded-[40px] bg-slate-900 border border-white/5 hover:border-amber-500/50 transition-all duration-500 shadow-xl">
-                <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center mb-6 text-amber-500 group-hover:scale-110 transition-transform shadow-lg">{s.icon}</div>
-                <h3 className="text-xl md:text-2xl font-bold mb-4 uppercase tracking-tight">{s.title}</h3>
-                <p className="text-slate-400 font-light text-base md:text-lg">{s.desc}</p>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </section>
-
-      {/* Infrastructure Comparison */}
-      <section className="px-6 py-24 md:py-32 bg-slate-950">
-        <ScrollReveal>
-          <div className="max-w-6xl mx-auto text-center">
-             <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">The Infrastructure</h2>
-             <h3 className="text-4xl md:text-7xl font-black tracking-tighter uppercase mb-8 leading-none">BUILT DIFFERENT.</h3>
-             <p className="text-slate-400 text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed italic px-4 mb-20">Most websites sit on one cheap server. Ours run on the same global edge network used by modern apps — fast, secure, maintenance-free.</p>
-          </div>
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 items-stretch relative">
-            <div className="bg-slate-900/50 p-8 md:p-12 rounded-t-[40px] lg:rounded-tr-none lg:rounded-l-[40px] border border-white/10 relative z-10 shadow-lg">
-                <h4 className="text-xl font-bold text-slate-200 mb-10 flex items-center uppercase tracking-tight"><Home className="w-6 h-6 mr-3 text-slate-500" /> Traditional Hosting</h4>
-                <div className="space-y-6">
-                  {[
-                    { l: "Server Type", v: "Single Location", i: <X className="w-4 h-4 text-slate-500" /> },
-                    { l: "Load Speed", v: "Variable / Slow", i: <X className="w-4 h-4 text-slate-500" /> },
-                    { l: "Updates", v: "Manual Required", i: <X className="w-4 h-4 text-slate-500" /> },
-                    { l: "Traffic", v: "Struggles Under Traffic", i: <X className="w-4 h-4 text-slate-500" /> },
-                    { l: "Maintenance", v: "Ongoing Effort", i: <X className="w-4 h-4 text-slate-500" /> }
-                  ].map((row, i) => (
-                    <div key={i} className="flex justify-between border-b border-white/5 pb-4">
-                      <p className="text-[10px] text-slate-600 uppercase font-black tracking-widest">{row.l}</p>
-                      <p className="text-sm text-slate-300 font-medium">{row.v}</p>
-                    </div>
-                  ))}
-                </div>
-            </div>
-            <div className="relative bg-slate-900 p-8 md:p-12 rounded-b-[40px] lg:rounded-bl-none lg:rounded-r-[40px] border-2 border-amber-500/30 shadow-[0_0_100px_rgba(212,175,55,0.08)] z-20 overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[100px] pointer-events-none" />
-                <h4 className="text-xl font-bold text-white mb-10 flex items-center relative z-10 uppercase tracking-tight"><Network className="w-6 h-6 mr-3 text-amber-500" /> Callista Digital</h4>
-                <div className="space-y-6 relative z-10">
-                  {[
-                    { l: "Server Type", v: "Global Edge Network", i: <CheckCircle2 className="w-4 h-4 text-amber-500" /> },
-                    { l: "Load Speed", v: "Instant Everywhere", i: <CheckCircle2 className="w-4 h-4 text-amber-500" /> },
-                    { l: "Updates", v: "Fully Automated", i: <CheckCircle2 className="w-4 h-4 text-amber-500" /> },
-                    { l: "Traffic", v: "Unlimited Scaling", i: <CheckCircle2 className="w-4 h-4 text-amber-500" /> },
-                    { l: "Maintenance", v: "Zero Required", i: <CheckCircle2 className="w-4 h-4 text-amber-500" /> }
-                  ].map((row, i) => (
-                    <div key={i} className="flex justify-between border-b border-amber-500/10 pb-4">
-                      <p className="text-[10px] text-amber-500/60 uppercase font-black tracking-widest">{row.l}</p>
-                      <p className="text-sm text-white font-bold">{row.v}</p>
-                    </div>
-                  ))}
-                </div>
-            </div>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* Upgrade CTA */}
-      <section className="px-6 py-24 bg-slate-950 text-center border-y border-white/5">
-        <ScrollReveal>
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-black mb-8 uppercase tracking-tighter leading-[0.9]">Ready to upgrade your <br className="hidden md:block" /> <span className="text-amber-500">infrastructure?</span></h2>
-            <p className="text-lg text-slate-400 font-light mb-12 max-w-xl mx-auto italic">Experience the speed, security, and prestige of a global edge network built for the modern web.</p>
-            <GlowingButton onClick={() => setView('pricing')}>Get Started <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" /></GlowingButton>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* The Studio Section */}
-      <section className="px-6 py-32 max-w-6xl mx-auto">
-        <ScrollReveal>
-          <div className="grid grid-cols-1 lg:grid-cols-2 bg-slate-900 rounded-[60px] border border-white/5 overflow-hidden shadow-2xl">
-            <div className="p-10 md:p-24 flex flex-col justify-center order-2 lg:order-1 font-sans">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 tracking-widest uppercase">THE STUDIO</h2>
-              <p className="text-3xl md:text-4xl font-bold leading-tight mb-8 text-white">
-                We craft digital front doors that <span className="italic underline decoration-amber-500 decoration-4 text-white">command attention.</span>
-              </p>
-              <div className="space-y-6 mb-10">
-                <p className="text-xl text-white font-bold leading-relaxed">
-                  Your first impression lives online.
-                </p>
-                <p className="text-slate-400 text-lg font-light leading-relaxed">
-                  We design beautifully crafted, hosted brand systems that replace scattered links, guide visitors effortlessly, and convert attention into action.
-                </p>
-              </div>
-              <div className="flex items-center space-x-3 uppercase"><div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /><p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 font-black tracking-widest">Callista Digital Strategy</p></div>
-            </div>
-            <div className="relative min-h-[400px] md:min-h-[600px] bg-slate-950 overflow-hidden order-1 lg:order-2">
-              <img src={RAHJ_IMAGE} alt="Founder" className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105 opacity-80" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
-            </div>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* Social Proof Testimonials */}
-      <section className="px-6 py-24 md:py-32 bg-slate-950 border-t border-white/5">
-        <div className="max-w-6xl mx-auto">
-          <ScrollReveal>
-            <div className="text-center mb-16">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">Client Success</h2>
-              <h3 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-8 leading-none">REAL WORLD <span className="text-amber-500">RESULTS.</span></h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-              <div className="bg-slate-900 p-8 md:p-12 rounded-[40px] border border-white/5 relative group hover:border-amber-500/30 transition-all duration-500 shadow-xl">
-                <Quote className="w-10 h-10 text-amber-500/20 absolute top-8 right-8 group-hover:text-amber-500/40 transition-colors" />
-                <div className="mb-8">
-                  <p className="text-lg md:text-xl text-slate-300 font-light leading-relaxed italic mb-8">
-                    "Our catering brand needed to look as premium as our menu. Callista Digital didn't just build a site; they built an elite digital presence that commands attention and converts inquiries into bookings effortlessly."
-                  </p>
-                  <div className="h-px w-12 bg-amber-500 mb-6" />
-                  <div>
-                    <p className="text-white font-black uppercase tracking-widest text-sm">Marcella V.</p>
-                    <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest mt-1">Founder, Vesper Catering Co.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-slate-900 p-8 md:p-12 rounded-[40px] border border-white/5 relative group hover:border-amber-500/30 transition-all duration-500 shadow-xl">
-                <Quote className="w-10 h-10 text-amber-500/20 absolute top-8 right-8 group-hover:text-amber-500/40 transition-colors" />
-                <div className="mb-8">
-                  <p className="text-lg md:text-xl text-slate-300 font-light leading-relaxed italic mb-8">
-                    "The scale of our travel club requires absolute precision. The systems Callista implemented are fast, secure, and established instant trust with our members. It’s intelligent design that actually scales."
-                  </p>
-                  <div className="h-px w-12 bg-amber-500 mb-6" />
-                  <div>
-                    <p className="text-white font-black uppercase tracking-widest text-sm">Elias K.</p>
-                    <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest mt-1">Founder, Nomad Horizon Club</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="px-6 py-24 md:py-32 bg-slate-900 relative">
-        <div className="max-w-4xl mx-auto">
-          <ScrollReveal>
-            <div className="text-center mb-20">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">FAQ</h2>
-              <h3 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-8 leading-none">Built Differently.</h3>
-            </div>
-            <div className="space-y-2">
-              {faqs.map((faq, index) => (
-                <FAQItem 
-                  key={index}
-                  question={faq.q}
-                  answer={faq.a}
-                  isOpen={openFaq === index}
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                />
-              ))}
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="px-6 py-20 bg-black border-t border-white/5 text-center font-sans px-4">
-        <div className="max-w-xl mx-auto">
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-block group mb-10">
-            <Instagram className="w-10 h-10 text-slate-500 group-hover:text-amber-500 transition-all transform group-hover:scale-110" />
-          </a>
-          <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.3em] text-slate-600 font-bold uppercase space-y-4">
-            <img src={TEXT_LOGO} alt="Callista Digital" className="h-4 w-auto opacity-40 brightness-200 grayscale" />
-            <span>EST. 2014 • CLEAN PAGES. CLEAR NEXT STEPS.</span>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-
-  const PageTwo = () => (
-    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-amber-500/30 overflow-x-hidden">
-      <Header />
-      <main className="pt-32 pb-24 px-6 max-w-7xl mx-auto w-full">
-        <ScrollReveal>
-          <div className="text-center mb-24">
-            <div className="inline-block p-4 rounded-3xl bg-slate-900 border border-white/10 shadow-2xl mb-8 animate-bounce"><ShoppingBag className="w-10 h-10 text-amber-500" /></div>
-            <h1 className="text-5xl md:text-8xl font-black mb-6 uppercase tracking-tighter leading-[0.85]">PRICING <br/><span className="text-amber-500 uppercase font-black tracking-tight">Structure.</span></h1>
-            <p className="text-xl md:text-2xl text-slate-400 font-light max-w-2xl mx-auto italic leading-relaxed font-light px-4 text-center">Simple. Clear. Designed for social-first brands.</p>
-          </div>
-        </ScrollReveal>
-
-        {/* PRICING TIERS */}
-        <section className="mb-40 overflow-visible pt-10">
-          <ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-8 items-stretch mt-12 px-4 md:px-0 overflow-visible max-w-4xl mx-auto">
-              
-              {/* TIER 1: Conversion Hub (Updated to Request Project) */}
-              <div className="relative bg-slate-900 p-8 md:p-10 rounded-[48px] border-2 border-amber-500/40 flex flex-col shadow-2xl overflow-visible">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap shadow-xl z-30 font-black">Entry Tier</div>
-                <div className="text-center mb-10 pt-8">
-                  <div className="flex justify-center items-center font-black">
-                    <span className="text-2xl text-slate-500 mr-1">$</span>
-                    <span className="text-7xl text-white tracking-tighter">197</span>
-                  </div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase mt-4 tracking-widest font-black">Setup + $20/month</p>
-                </div>
-                <h4 className="text-xl font-black text-center mb-4 uppercase tracking-tight">Conversion Hub</h4>
-                <p className="text-xs text-slate-500 text-center mb-8 italic font-medium leading-relaxed">A premium personal landing system built in 72 hours.</p>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
-                  {["Single Premium Landing Page", "Optimized Mobile Flow", "Custom CTA Architecture", "72-Hour Deployment", "Global Edge Hosting"].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
-                  ))}
-                </div>
-                <GlowingButton variant="none" onClick={() => openInquiry("Conversion Hub - Request")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Request Project</GlowingButton>
-              </div>
-
-              {/* TIER 2: Website Builds */}
-              <div className="bg-slate-900 p-8 md:p-10 rounded-[48px] border border-white/5 flex flex-col shadow-lg">
-                <div className="text-center mb-10 pt-8">
-                  <div className="flex flex-col justify-center items-center font-black">
-                    <span className="text-xs text-slate-600 uppercase tracking-widest mb-1 font-black">Starting at</span>
-                    <div className="flex items-center">
-                      <span className="text-2xl text-slate-500 mr-1">$</span>
-                      <span className="text-7xl text-white tracking-tighter">997</span>
-                    </div>
-                  </div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase mt-4 tracking-widest font-black">Strategic Build</p>
-                </div>
-                <h4 className="text-xl font-black text-center mb-4 uppercase tracking-tight">Website Builds</h4>
-                <p className="text-xs text-slate-500 text-center mb-8 italic font-medium leading-relaxed">Custom high-converting websites tailored to your business goals.</p>
-                <div className="space-y-4 mb-10 flex-grow text-sm text-slate-400 font-medium italic">
-                  {["Strategic Multi-Page Build", "Custom Brand Development", "Deep SEO Implementation", "Integrated Sales Systems", "High-Volume Infrastructure"].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3 text-xs md:text-sm"><CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" /><span>{f}</span></div>
-                  ))}
-                </div>
-                <GlowingButton variant="none" theme="silver" onClick={() => openInquiry("Website Build - Request")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Request Project</GlowingButton>
-              </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Management Support */}
-        <section className="mb-40" id="support-plan">
-          <ScrollReveal>
-            <div className="text-center mb-16 max-w-md mx-auto px-4">
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-6 font-black tracking-widest uppercase">Ongoing Management</h2>
-              <div className="relative p-10 rounded-[48px] bg-slate-900 border-2 border-amber-500/20 shadow-3xl text-center hover:border-amber-500/40 transition-all group">
-                <div className="flex flex-col items-center mb-10">
-                  <div className="flex items-baseline font-sans font-black"><span className="text-2xl font-black text-slate-500 mr-1">$</span><span className="text-7xl font-black text-white tracking-tighter">125</span><span className="text-slate-500 text-xs font-black ml-2 uppercase tracking-widest font-black">/ month</span></div>
-                </div>
-                <div className="space-y-4 mb-10 text-left text-sm text-slate-300 font-medium italic">
-                  {["Global edge network hosting", "Secure SSL & 24/7 monitoring", "Managed bandwidth scaling", "1 Professional edit per month"].map((f, i) => (
-                    <div key={i} className="flex items-center space-x-3"><CheckCircle2 className="w-4 h-4 text-amber-500" /><span>{f}</span></div>
-                  ))}
-                </div>
-                <GlowingButton variant="none" onClick={() => openInquiry("Management Plan")} className="w-full py-5 text-sm uppercase font-black tracking-widest">Start Support Plan</GlowingButton>
-              </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Custom Section */}
-        <section className="mb-40">
-          <ScrollReveal>
-            <div className="bg-amber-500/5 border border-amber-500/20 p-10 md:p-20 rounded-[60px] text-center relative overflow-hidden group shadow-2xl mx-4 md:mx-0 flex flex-col items-center">
-              <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none duration-1000"><Globe className="w-64 h-64 text-amber-500" /></div>
-              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black tracking-widest uppercase">CUSTOM SOLUTIONS</h2>
-              <h3 className="text-4xl md:text-8xl font-black mb-10 tracking-tighter uppercase leading-[0.9] text-white max-w-4xl text-center">CUSTOM <br className="md:hidden" /> ARCHITECTURE.</h3>
-              <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed mb-12 px-4 italic text-center">High-volume infrastructure and fully bespoke software designs. <br/> Offered selectively to ensure elite build quality.</p>
-              <div className="flex flex-col items-center">
-                <button 
-                  onClick={() => openInquiry("Request Custom Architecture")}
-                  className="group flex items-center text-xs font-black uppercase tracking-[0.4em] text-white bg-slate-900 border border-white/10 px-10 py-5 rounded-full hover:bg-black transition-all shadow-3xl hover:border-amber-500/30 font-black"
-                >
-                  <Mail className="w-4 h-4 mr-3 text-amber-500 group-hover:scale-110 transition-transform" />
-                  Request Custom Architecture
-                </button>
-              </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* TRUST STRIP SECTION */}
-        <section className="py-24 border-y border-white/5 bg-slate-900/50">
-          <div className="max-w-6xl mx-auto px-6 text-center">
-            <ScrollReveal>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500 mb-8 font-black uppercase">Process Over Promises</h2>
-              <h3 className="text-3xl md:text-5xl font-black mb-12 uppercase tracking-tighter leading-tight text-white max-w-4xl mx-auto">Built With Structure. <br className="hidden md:block" /> Delivered With Precision.</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 border-t border-white/5 pt-12">
-                {[
-                  "Structured onboarding.",
-                  "Strategy-first build process.",
-                  "Revision framework included.",
-                  "Managed launch support."
-                ].map((item, i) => (
-                  <div key={i} className="flex flex-col items-center md:items-start text-center md:text-left space-y-2">
-                    <CheckCircle2 className="w-4 h-4 text-amber-500 mb-2" />
-                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 leading-relaxed font-black">
-                      {item}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        <footer className="pt-20 pb-10 flex flex-col md:flex-row justify-between items-center text-[9px] tracking-[0.3em] text-slate-700 font-black border-t border-white/5 space-y-4 uppercase font-black px-4">
-           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="group">
-            <Instagram className="w-6 h-6 text-slate-700 group-hover:text-amber-500 transition-colors" />
-           </a>
-           <img src={TEXT_LOGO} alt="Callista Digital" className="h-3 w-auto opacity-30 brightness-200 grayscale" />
-           <span>© 2014 - 2026</span>
-        </footer>
-      </main>
-    </div>
-  );
-
-  return (
-    <div className="font-sans antialiased bg-slate-950 w-full overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
-      <ChatBot messages={chatMessages} setMessages={setChatMessages} />
-      <InquiryModal 
-        isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-        selectedPackage={selectedPackage} 
-      />
-      {view === 'home' ? <PageOne /> : <PageTwo />}
-    </div>
-  );
-};
-
-export default App;
+  return <>
+    <a className="skip" href="#main">Skip to content</a>
+    <Header toolsPage={toolsPage} />
+    <main id="main" tabIndex={-1}>{toolsPage ? <CreatorTools /> : <Home />}</main>
+    <Footer />
+  </>;
+}
