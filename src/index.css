@@ -60,7 +60,7 @@ nav a[aria-current] { color: #fbbf24; }
 .hero .eyebrow, .tools-page .eyebrow { display: inline-block; padding: 8px 17px; border-radius: 999px; border: 1px solid #f59e0b36; background: #f59e0b16; }
 h1, h2, h3 { margin: 0; font-weight: 900; line-height: 1; letter-spacing: -.055em; text-transform: uppercase; text-wrap: balance; }
 h1 { font-size: clamp(2.65rem, 7.6vw, 7rem); margin-block: 24px; }
-.hero h1 { line-height: .94; text-shadow: 0 12px 42px #020617b3; }
+.hero h1 { font-size: clamp(2.65rem, 6.2vw, 6rem); line-height: .94; text-shadow: 0 12px 42px #020617b3; }
 .hero h1 em { display: block; color: var(--gold); font-style: normal; }
 h2 { font-size: clamp(2.15rem, 5.1vw, 4.45rem); margin-top: 12px; }
 h3, .tool-title { font-size: clamp(1.24rem, 2.3vw, 1.65rem); line-height: 1.12; letter-spacing: -.035em; }
