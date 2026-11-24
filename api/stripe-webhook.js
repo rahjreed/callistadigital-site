@@ -33,7 +33,7 @@ function verifyStripeSignature(payload, header, secret) {
 
 const PROJECT_ID = "callista-digital";
 const PAYMENT_LINK = "plink_1Uf52S8c4pFptBOLKi3CupK4";
-const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
+const FIRESTORE_BASE = `projects/${PROJECT_ID}/databases/(default)/documents`;
 
 function firebaseValue(value) {
   if (value === null || value === undefined) return { nullValue: null };
