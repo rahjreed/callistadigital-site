@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><meta name="referrer" content="no-referrer">
+<title>Track your travel order | Callista Digital</title>
+<link rel="icon" href="/favicon.png">
+<style>
+body{font:18px/1.6 system-ui,sans-serif;background:#0b1220;color:#fff;margin:0}
+main{max-width:720px;margin:50px auto;padding:24px}a{color:#e6b85a}
+input,button{font:inherit;padding:12px;border-radius:10px;max-width:100%;box-sizing:border-box}
+input{width:100%;margin:12px 0}button{background:#e6b85a;color:#101826;cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+</head>
+<body><main>
+<a href="/travel/">← Travel services</a>
+<h1>Track your order</h1>
+<p>Use the private order reference from your onboarding link. Keep it private.</p>
+<form id="tracking"><label for="reference">Order reference</label><input id="reference" name="reference" required autocomplete="off" pattern="trv_[a-f0-9]{64}"><button>View order status</button></form>
+<pre id="result" role="status" aria-live="polite"></pre>
+<p><a href="/api/travel-billing">Manage billing or cancel through Stripe</a></p>
+<p>For help or a setup refund request, email <a href="mailto:hello@callistadigital.com">hello@callistadigital.com</a>.</p>
+<p>The $99 setup fee is refundable upon request within 72 hours of payment, even if work has started. Processed monthly charges are nonrefundable except as required by law. Cancellation takes effect at the end of the current billing period.</p>
+</main>
+<script type="module">
+const form = document.querySelector('#tracking');
+const result = document.querySelector('#result');
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = form.querySelector('button');
+  button.disabled = true;
+  result.textContent = 'Checking your order…';
+  try {
+    const response = await fetch('/api/travel-order', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({orderReference: document.querySelector('#reference').value.trim()})
+    });
+    const data = await response.json();
+    result.textContent = response.ok
+      ? Object.entries(data).map(([key,value]) => key.replace(/[A-Z]/g, letter => ' ' + letter.toLowerCase()) + ': ' + (value ?? 'Pending')).join('\n')
+      : data.error;
+  } catch { result.textContent = 'Status unavailable. Please try again or email us.'; }
+  finally { button.disabled = false; }
+});
+</script></body></html>
