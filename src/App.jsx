@@ -1,7 +1,7 @@
 import React, { useLayoutEffect } from 'react';
 import {
   ArrowDown, ArrowRight, ArrowUpRight, Braces, Camera, Gamepad2, Globe2,
-  House, Layers3, Mail, MonitorSmartphone, Plane, Workflow,
+  House, Layers3, Mail, MonitorSmartphone, Plane, HeartPulse, Workflow,
 } from 'lucide-react';
 import { email, projects, tools } from './site.js';
 
@@ -76,6 +76,7 @@ function ProjectCard({ project }) {
       {image && <img src={image} alt="" />}
       {artwork === 'close' && <House size={80} strokeWidth={1} />}
       {artwork === 'travel' && <Plane size={80} strokeWidth={1} />}
+      {artwork === 'pressure' && <HeartPulse size={80} strokeWidth={1} />}
     </div>
     <div className="project-copy">
       <p className="eyebrow">{category}</p>
