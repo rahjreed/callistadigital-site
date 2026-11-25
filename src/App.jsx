@@ -1,7 +1,7 @@
 import React, { useLayoutEffect } from 'react';
 import {
   ArrowDown, ArrowRight, ArrowUpRight, Braces, Camera, Gamepad2, Globe2,
-  House, Layers3, Mail, MonitorSmartphone, Radio, Workflow,
+  House, Layers3, Mail, MonitorSmartphone, Plane, HeartPulse, Workflow,
 } from 'lucide-react';
 import { email, projects, tools } from './site.js';
 
@@ -75,7 +75,8 @@ function ProjectCard({ project }) {
     <div className={'project-art ' + artwork} aria-hidden="true">
       {image && <img src={image} alt="" />}
       {artwork === 'close' && <House size={80} strokeWidth={1} />}
-      {artwork === 'roger' && <Radio size={80} strokeWidth={1} />}
+      {artwork === 'travel' && <Plane size={80} strokeWidth={1} />}
+      {artwork === 'pressure' && <HeartPulse size={80} strokeWidth={1} />}
     </div>
     <div className="project-copy">
       <p className="eyebrow">{category}</p>
@@ -119,7 +120,7 @@ function Home() {
     <section className="shell section" id="work" aria-labelledby="work-title">
       <p className="eyebrow">02 / Portfolio</p>
       <h2 id="work-title">Selected work</h2>
-      <p className="intro">Explore live examples of the sites, apps, and interactive experiences we build.</p>
+      <p className="intro">Explore our technology brands and live examples of the sites, apps, and interactive experiences we build.</p>
       <div className="project-grid">{projects.map(project => <ProjectCard key={project.name} project={project} />)}</div>
     </section>
 

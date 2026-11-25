@@ -18,8 +18,16 @@ export const tools = [
 
 export const projects = [
   {
+    name: 'PRESSURE',
+    category: 'Health & wellness app',
+    description: 'A free blood pressure tracking app with guided logging, trends, measurement history and export tools.',
+    url: 'https://pressure.callistadigital.com/',
+    action: 'Open PRESSURE',
+    artwork: 'pressure',
+  },
+  {
     name: tools[0].name,
-    category: 'Creator utility',
+    category: 'Creator utility · Presented by Travel Pro X',
     description: 'A browser-based video teleprompter that helps creators read a script while recording.',
     url: tools[0].url,
     action: 'Open teleprompter',
@@ -44,11 +52,11 @@ export const projects = [
     artwork: 'close',
   },
   {
-    name: 'Roger With Vivint',
-    category: 'Business website',
-    description: 'A customer hub for smart-home inquiries, referrals, and support resources.',
-    url: 'https://www.rogerwithvivint.com/',
-    action: 'Visit Roger With Vivint',
-    artwork: 'roger',
+    name: 'Travel Pro X',
+    category: 'Travel technology · A Callista Digital Company',
+    description: 'Our independent travel marketing technology brand, offering creator tools, marketing resources and an upcoming personalized funnel builder.',
+    url: 'https://www.travelprox.com/',
+    action: 'Visit Travel Pro X',
+    artwork: 'travel',
   },
 ];
