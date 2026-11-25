@@ -18,6 +18,14 @@ export const tools = [
 
 export const projects = [
   {
+    name: 'PRESSURE',
+    category: 'Health & wellness app',
+    description: 'A free blood pressure tracking app with guided logging, trends, measurement history and export tools.',
+    url: 'https://pressure.callistadigital.com/',
+    action: 'Open PRESSURE',
+    artwork: 'pressure',
+  },
+  {
     name: tools[0].name,
     category: 'Creator utility · Presented by Travel Pro X',
     description: 'A browser-based video teleprompter that helps creators read a script while recording.',
